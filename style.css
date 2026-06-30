@@ -1,6 +1,6 @@
 :root {
-    --bg-light-pink: #fdf5f7; /* Tło strony z projektu */
-    --text-pink: #c97b8f; /* Kolor liter ASIA i ikon */
+    --bg-light-pink: #fdf5f7; 
+    --text-pink: #c97b8f; 
     --text-light-pink: #d89aa9;
     --envelope-body: #fce4e9;
     --envelope-flap: #f4b8c5;
@@ -14,21 +14,9 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-light-pink);
     color: var(--text-pink);
     overflow-x: hidden;
-    
-    /* Symulacja pudrowego tła w stylu watercolor */
-    background-color: #fdf5f7;
-    background-image: 
-        /* Jasny, miękki punkt światła u góry po lewej (imitacja serca) */
-        radial-gradient(circle at 10% 10%, rgba(250, 218, 226, 0.8) 0%, transparent 40%),
-        /* Ciepły, różowy blask u góry po prawej (imitacja dużego kwiata) */
-        radial-gradient(circle at 90% 5%, rgba(244, 184, 197, 0.6) 0%, transparent 50%),
-        /* Lekki róż na dole przy balonach */
-        radial-gradient(circle at 80% 90%, rgba(242, 186, 197, 0.7) 0%, transparent 40%),
-        /* Subtelny szum imitujący teksturę papieru akwarelowego */
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-    background-attachment: fixed;
 }
 
 body.locked-scroll {
@@ -36,7 +24,7 @@ body.locked-scroll {
     height: 100vh;
 }
 
-/* ================= EKRAN STARTOWY (JASNORÓŻOWY) ================= */
+/* ================= EKRAN STARTOWY ================= */
 #intro-screen {
     position: fixed;
     inset: 0;
@@ -58,7 +46,6 @@ body.locked-scroll {
     animation: pulse 2s infinite;
 }
 
-/* KOPERTA */
 .envelope-wrapper {
     position: relative;
     width: 300px;
@@ -106,7 +93,6 @@ body.locked-scroll {
     transition: transform 0.6s ease-in-out;
 }
 
-/* Różowa pieczęć */
 .wax-seal {
     position: absolute;
     top: 85px;
@@ -136,8 +122,11 @@ body.locked-scroll {
     50% { opacity: 1; }
 }
 
-/* ================= GŁÓWNA STRONA ================= */
+/* ================= GŁÓWNA STRONA Z TŁEM ================= */
 #main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     min-height: 100vh;
 }
 
@@ -146,37 +135,72 @@ body.locked-scroll {
     opacity: 0;
 }
 
-section {
+/* KONTENER TRZYMAJĄCY PROPORCJE OBRAZKA */
+.canvas-wrapper {
     position: relative;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 50px 20px;
-    text-align: center;
-    /* TUTAJ ZALECAM DODAĆ WYEKSPORTOWANE TŁA:
-       background-image: url('tlo_1.jpg');
-       background-size: cover;
-    */
+    width: 100%;
+    max-width: 550px; /* Maksymalna szerokość jak na telefonie/tablecie */
+    aspect-ratio: 1 / 1.45; /* Proporcje wygenerowanego tła */
+    background-image: url('tlo.png'); /* TWOJE WYGENEROWANE TŁO */
+    background-size: 100% 100%;
+    background-position: top center;
+    background-repeat: no-repeat;
+    overflow: hidden;
 }
 
-/* --- TYPOGRAFIA --- */
+/* --- POZYCJONOWANIE BLOKÓW NA OBRAZKU --- */
+/* (Wartości 'top' możesz lekko zwiększać/zmniejszać, żeby idealnie wcelować w elementy na Twoim obrazku) */
+
+.header-block {
+    position: absolute;
+    top: 2%; /* Odstęp od góry */
+    width: 100%;
+    text-align: center;
+}
+
+.dj-block {
+    position: absolute;
+    top: 30%; /* Trafienie w pierwszy duży wieniec */
+    width: 100%;
+    text-align: center;
+}
+
+.details-block {
+    position: absolute;
+    top: 55%; /* Trafienie w dolne wieńce */
+    width: 100%;
+    text-align: center;
+}
+
+.photo-block {
+    position: absolute;
+    bottom: 0; /* Przyklejenie zdjęcia do samego dołu obok balonów */
+    left: 5%;
+    width: 45%; /* Rozmiar zdjęcia względem szerokości ekranu */
+}
+
+.photo-block img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+
+/* --- WYGLĄD ELEMENTÓW (Typografia i Przyciski) --- */
 .subtitle {
-    font-size: 1.1rem;
+    font-size: clamp(0.8rem, 3vw, 1.1rem);
     letter-spacing: 3px;
     color: var(--text-light-pink);
-    margin-bottom: 15px;
-    text-transform: uppercase;
+    margin-bottom: 5px;
 }
 
 .main-title {
     font-family: 'Playfair Display', serif;
-    font-size: 5.5rem;
-    font-weight: 400;
+    font-size: clamp(3rem, 12vw, 5rem);
     color: var(--text-pink);
     line-height: 1;
-    margin-bottom: 10px;
 }
 
-/* Kropka nad 'I' w formie serduszka (trik CSS) */
 .heart-dot {
     position: relative;
     display: inline-block;
@@ -187,15 +211,8 @@ section {
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 4vw, 1.5rem);
     color: var(--text-pink);
-}
-
-.separator-bow, .separator-bow-small {
-    font-size: 1.5rem;
-    color: var(--text-pink);
-    margin: 15px 0;
-    opacity: 0.7;
 }
 
 .date-row {
@@ -203,139 +220,78 @@ section {
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 1.3rem;
-    font-weight: 400;
     font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    margin: 10px 0;
 }
-.date-row .number { font-size: 2.2rem; font-weight: 600; }
+.date-row .number { font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 600; }
 .date-row .separator { opacity: 0.4; }
-
-.separator-leaves {
-    font-size: 1.2rem;
-    margin: 15px 0;
-    opacity: 0.8;
-}
 
 .time {
     font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
+    font-size: clamp(1.8rem, 7vw, 2.5rem);
     color: var(--text-pink);
-    margin-bottom: 40px;
 }
 
-/* ZDJĘCIE WYCIĘTE W TLE */
-.photo-wrapper {
-    position: relative;
-    width: 100%;
-    height: 350px;
-    display: flex;
-    justify-content: flex-end; /* Zdjęcie dociska do prawej jak na projekcie */
-    margin-top: -30px;
-}
-.photo-wrapper img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-}
-
-/* --- SEKCJA 2 --- */
 .handwritten-title {
     font-family: 'Amatic SC', cursive;
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
     color: var(--text-pink);
-    margin-bottom: 20px;
-    letter-spacing: 2px;
+    margin-bottom: 10px;
 }
 
-.dj-container {
-    margin-bottom: 40px;
-}
-
-/* Gigantyczny przycisk Spotify */
+/* Przycisk Spotify */
 .spotify-circle-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 130px;
-    height: 130px;
+    width: clamp(80px, 20vw, 110px);
+    height: clamp(80px, 20vw, 110px);
     background-color: var(--text-pink);
     color: #fff;
     border-radius: 50%;
-    font-size: 4.5rem;
+    font-size: clamp(2.5rem, 8vw, 4rem);
     margin: 0 auto;
     text-decoration: none;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s;
+    box-shadow: 0 5px 15px rgba(201, 123, 143, 0.4);
 }
-.spotify-circle-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 25px rgba(201, 123, 143, 0.4);
-}
+.spotify-circle-btn:hover { transform: scale(1.05); }
 
+/* Przyciski detali */
 .action-grid {
     display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 30px;
+    justify-content: center;
+    gap: 15px;
+    padding: 0 20px;
 }
 
 .action-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    width: 30%;
+    gap: 8px;
 }
 
 .round-icon-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 70px;
-    height: 70px;
+    width: clamp(50px, 12vw, 65px);
+    height: clamp(50px, 12vw, 65px);
     background-color: var(--text-pink);
     color: #fff;
     border-radius: 50%;
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     text-decoration: none;
     transition: transform 0.3s;
+    box-shadow: 0 5px 10px rgba(201, 123, 143, 0.3);
 }
 .round-icon-btn:hover { transform: scale(1.1); }
 
 .action-label {
-    font-size: 0.75rem;
+    font-size: clamp(0.55rem, 2vw, 0.7rem);
     font-weight: 600;
     text-align: center;
-    text-transform: uppercase;
     color: var(--text-pink);
-}
-
-/* --- Zaktualizuj tło dla pierwszej sekcji (Góra) --- */
-.hero-section {
-    position: relative;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 50px 20px;
-    text-align: center;
-    /* PODMIEŃ ŚCIEŻKĘ NA SWÓJ PLIK Z TŁEM (wygenerowanym obrazkiem 22) */
-    background-image: url('tlo_zaproszenia.png'); 
-    background-size: cover;
-    background-position: center;
-    /* Dodaj minimalną wysokość, żeby sekcja była duża jak tło */
-    min-height: 100vh;
-}
-
-/* --- Zaktualizuj tło dla drugiej sekcji (Dół) --- */
-.details-section {
-    position: relative;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 50px 20px;
-    text-align: center;
-    /* PODMIEŃ ŚCIEŻKĘ NA TEN SAM PLIK LUB PLIK DLA DRUGIEJ GRAFIKI */
-    background-image: url('tlo_details.png'); 
-    background-size: cover;
-    background-position: center;
-    /* Dodaj minimalną wysokość, żeby sekcja była duża jak tło */
-    min-height: 100vh;
 }
