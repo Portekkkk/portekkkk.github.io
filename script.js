@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof confetti === 'function') {
             setTimeout(() => {
                 confetti({
-                    particleCount: 100,
-                    spread: 70,
+                    particleCount: 120,
+                    spread: 80,
                     origin: { y: 0.6 },
-                    colors: ['#c95c75', '#f1aebd', '#ffffff', '#ffd700'] // Różowe i złote
+                    colors: ['#c95c75', '#f1aebd', '#ffffff', '#ffd700']
                 });
             }, 400);
         }
@@ -32,10 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 mainContent.style.opacity = '1';
                 
+                // URUCHOMIENIE ANIMACJI PRZY SCROLLU (AOS)
                 AOS.init({
-                    once: false,
-                    offset: 50,
+                    once: false, // Animacje powtarzają się przy przewijaniu góra/dół
+                    offset: 50,  // Czułość pojawiania się elementów
                 });
+                
             }, 1000);
         }, 1200);
     });
