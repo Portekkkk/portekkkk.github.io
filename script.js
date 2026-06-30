@@ -9,35 +9,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isOpened) return;
         isOpened = true;
 
-        // 1. Otwieramy kopertę
         envelopeWrapper.classList.add('is-open');
 
-        // 2. Po krótkiej chwili ukrywamy czarny ekran
+        if (typeof confetti === 'function') {
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#c95c75', '#f1aebd', '#ffffff', '#ffd700'] // Różowe i złote
+                });
+            }, 400);
+        }
+
         setTimeout(() => {
             introScreen.style.opacity = '0';
             
             setTimeout(() => {
-                // Usuwamy z drzewa DOM
                 introScreen.style.display = 'none';
-                
-                // Pokazujemy główny kontent i ustawiamy tło na jasne
                 mainContent.classList.remove('hidden');
-                document.body.style.backgroundColor = '#f8f8f8'; // Zmiana bg dla reszty okna
-                
-                // ODBLOKOWANIE SCROLLA!
                 document.body.classList.remove('locked-scroll');
                 
-                // Płynne pokazanie
                 mainContent.style.opacity = '1';
                 
-                // INICJALIZACJA AOS (Animacje przy scrollu)
-                // Uruchamiamy to dopiero tutaj, żeby skrypt policzył wysokości po odkryciu sekcji
                 AOS.init({
-                    once: false, // animacje odpalą się za każdym razem gdy scrollujesz góra-dół
-                    offset: 50,  // wjeżdża nieco szybciej
+                    once: false,
+                    offset: 50,
                 });
-                
             }, 1000);
-        }, 1000);
+        }, 1200);
     });
 });
