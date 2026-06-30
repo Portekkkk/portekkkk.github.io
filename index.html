@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>18 Urodziny Asi! 🌸</title>
     
-    <!-- Idealnie dobrane czcionki pod projekt Asi -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;600&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="locked-scroll">
 
-    <!-- EKRAN STARTOWY (JASNORÓŻOWA KOPERTA) -->
+    <!-- EKRAN STARTOWY (KOPERTA) -->
     <div id="intro-screen">
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope">
@@ -30,81 +28,62 @@
         <p class="intro-hint">KLIKNIJ W KOPERTĘ</p>
     </div>
 
-    <!-- GŁÓWNA STRONA -->
+    <!-- GŁÓWNA STRONA (Z TŁEM) -->
     <main id="main-content" class="hidden">
         
-        <!-- SEKCJA 1: HERO (Góra) -->
-        <!-- Tutaj w CSS nadasz tło z kwiatami z pierwszej grafiki -->
-        <section class="hero-section" data-aos="fade-up" data-aos-duration="1000">
+        <!-- Płótno, które zawsze trzyma proporcje tła -->
+        <div class="canvas-wrapper">
             
-            <p class="subtitle">IT'S MY BIRTHDAY</p>
-            <h1 class="main-title">AS<span class="heart-dot">I</span>A</h1>
-            
-            <div class="separator-bow">🎀</div>
-            
-            <div class="date-row">
-                <span class="day">PIĄTEK</span>
-                <span class="separator">|</span>
-                <span class="number">07</span>
-                <span class="separator">|</span>
-                <span class="month">SIERPNIA</span>
+            <!-- TYTUŁ I DATA (Wpasowane pod górne kwiaty) -->
+            <div class="header-block">
+                <p class="subtitle">IT'S MY BIRTHDAY</p>
+                <h1 class="main-title">AS<span class="heart-dot">I</span>A</h1>
+                <div class="date-row">
+                    <span class="day">PIĄTEK</span>
+                    <span class="separator">|</span>
+                    <span class="number">07</span>
+                    <span class="separator">|</span>
+                    <span class="month">SIERPNIA</span>
+                </div>
+                <div class="time">17:00</div>
             </div>
-            
-            <div class="separator-leaves">🌿 🩷 🌿</div>
-            
-            <div class="time">17:00</div>
-            
-            <div class="photo-wrapper">
-                <!-- Zdjęcie bez tła -->
-                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/200x300/transparent/cf738a?text=Foto+Asi';">
-            </div>
-            
-        </section>
 
-        <!-- SEKCJA 2: DETALE I LINKI (Dół) -->
-        <!-- Tutaj w CSS nadasz tło z wieńcami z drugiej grafiki -->
-        <section class="details-section" data-aos="fade-up">
-            
-            <!-- SELF DJ -->
-            <div class="dj-container">
+            <!-- SELF DJ (Spotify - trafia idealnie w DUŻY WIENIEC) -->
+            <div class="dj-block">
                 <h2 class="handwritten-title">SELF DJ!</h2>
-                
-                <!-- Przycisk Spotify umieszczony idealnie w miejscu wieńca na tle -->
                 <a href="LINK_DO_GOOGLE_DOCS_SPOTIFY" target="_blank" class="spotify-circle-btn">
                     <i class="fa-brands fa-spotify"></i>
                 </a>
             </div>
 
-            <div class="separator-bow-small">🎀</div>
-            
-            <h2 class="handwritten-title">DETAILS</h2>
-            
-            <div class="action-grid">
-                <!-- LOKALIZACJA -->
-                <div class="action-item">
-                    <a href="#" class="round-icon-btn"><i class="fa-solid fa-location-dot"></i></a>
-                    <span class="action-label">MIEJSCE</span>
-                </div>
-                
-                <!-- DRESS CODE -->
-                <div class="action-item">
-                    <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-shirt"></i></a>
-                    <span class="action-label">DRESS CODE</span>
-                </div>
-                
-                <!-- RSVP -->
-                <div class="action-item">
-                    <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-check"></i></a>
-                    <span class="action-label">POTWIERDZENIE<br>OBECNOŚCI</span>
+            <!-- AKCJE (Trafiają nad/w MAŁE WIEŃCE) -->
+            <div class="details-block">
+                <h2 class="handwritten-title">DETAILS</h2>
+                <div class="action-grid">
+                    <div class="action-item">
+                        <a href="#" class="round-icon-btn"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="action-label">MIEJSCE</span>
+                    </div>
+                    <div class="action-item">
+                        <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-shirt"></i></a>
+                        <span class="action-label">DRESS CODE</span>
+                    </div>
+                    <div class="action-item">
+                        <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-check"></i></a>
+                        <span class="action-label">POTWIERDZENIE</span>
+                    </div>
                 </div>
             </div>
-            
-        </section>
-        
+
+            <!-- ZDJĘCIE JUBILATKI (Dół strony, obok balonów) -->
+            <div class="photo-block">
+                <img src="foto_asia.png" alt="Asia">
+            </div>
+
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
