@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>18 Urodziny Asi! 🌸</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Idealnie dobrane czcionki pod projekt Asi -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;600&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
@@ -14,7 +15,7 @@
 </head>
 <body class="locked-scroll">
 
-    <!-- EKRAN STARTOWY (RÓŻOWA KOPERTA) -->
+    <!-- EKRAN STARTOWY (JASNORÓŻOWA KOPERTA) -->
     <div id="intro-screen">
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope">
@@ -22,19 +23,24 @@
                 <div class="envelope-flap"></div>
             </div>
             <div class="wax-seal">
-                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-heart"></i>
                 <span>OPEN</span>
             </div>
         </div>
-        <p class="intro-hint">KLIKNIJ KOPERTĘ, ABY OTWORZYĆ</p>
+        <p class="intro-hint">KLIKNIJ W KOPERTĘ</p>
     </div>
 
-    <!-- GŁÓWNE ZAPROSZENIE (JASNE I RÓŻOWE) -->
+    <!-- GŁÓWNA STRONA -->
     <main id="main-content" class="hidden">
         
+        <!-- SEKCJA 1: HERO (Góra) -->
+        <!-- Tutaj w CSS nadasz tło z kwiatami z pierwszej grafiki -->
         <section class="hero-section" data-aos="fade-up" data-aos-duration="1000">
+            
             <p class="subtitle">IT'S MY BIRTHDAY</p>
-            <h1 class="main-title">ASIA</h1>
+            <h1 class="main-title">AS<span class="heart-dot">I</span>A</h1>
+            
+            <div class="separator-bow">🎀</div>
             
             <div class="date-row">
                 <span class="day">PIĄTEK</span>
@@ -44,45 +50,51 @@
                 <span class="month">SIERPNIA</span>
             </div>
             
+            <div class="separator-leaves">🌿 🩷 🌿</div>
+            
             <div class="time">17:00</div>
             
             <div class="photo-wrapper">
-                <!-- Zdjęcie w pełnych kolorach -->
-                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/300x400/fce4e9/c95c75?text=Foto+Asi';">
+                <!-- Zdjęcie bez tła -->
+                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/200x300/transparent/cf738a?text=Foto+Asi';">
             </div>
+            
         </section>
 
-        <!-- SEKCJA AKCJI I LINKÓW -->
-        <section class="action-section" data-aos="fade-up">
+        <!-- SEKCJA 2: DETALE I LINKI (Dół) -->
+        <!-- Tutaj w CSS nadasz tło z wieńcami z drugiej grafiki -->
+        <section class="details-section" data-aos="fade-up">
             
             <!-- SELF DJ -->
-            <div class="dj-section">
-                <h2 class="section-title">SELF DJ!</h2>
-                <!-- Link do Google Docs, tak jak Asia prosiła -->
-                <a href="TUTAJ_WKLEJ_LINK_DO_GOOGLE_DOCS_ZE_SPOTIFY" target="_blank" class="spotify-btn">
-                    <i class="fa-brands fa-spotify"></i> Dodaj swoje nutki
+            <div class="dj-container">
+                <h2 class="handwritten-title">SELF DJ!</h2>
+                
+                <!-- Przycisk Spotify umieszczony idealnie w miejscu wieńca na tle -->
+                <a href="LINK_DO_GOOGLE_DOCS_SPOTIFY" target="_blank" class="spotify-circle-btn">
+                    <i class="fa-brands fa-spotify"></i>
                 </a>
             </div>
 
-            <!-- SZCZEGÓŁY -->
-            <h2 class="section-title details-title">DETAILS</h2>
+            <div class="separator-bow-small">🎀</div>
+            
+            <h2 class="handwritten-title">DETAILS</h2>
             
             <div class="action-grid">
                 <!-- LOKALIZACJA -->
                 <div class="action-item">
-                    <a href="#" class="round-btn"><i class="fa-solid fa-location-dot"></i></a>
+                    <a href="#" class="round-icon-btn"><i class="fa-solid fa-location-dot"></i></a>
                     <span class="action-label">MIEJSCE</span>
                 </div>
                 
                 <!-- DRESS CODE -->
                 <div class="action-item">
-                    <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-btn"><i class="fa-solid fa-user-tie"></i></a>
+                    <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-shirt"></i></a>
                     <span class="action-label">DRESS CODE</span>
                 </div>
                 
                 <!-- RSVP -->
                 <div class="action-item">
-                    <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-btn"><i class="fa-solid fa-check"></i></a>
+                    <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-check"></i></a>
                     <span class="action-label">POTWIERDZENIE<br>OBECNOŚCI</span>
                 </div>
             </div>
