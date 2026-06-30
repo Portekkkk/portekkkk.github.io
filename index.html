@@ -3,61 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>18 Urodziny Asi!</title>
+    <title>18 Urodziny Asi! 🌸</title>
     
-    <!-- Fonty: Elegancki szeryfowy i czysty bezszeryfowy -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Ikony FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Favicon (Ikonka w karcie przeglądarki) -->
-    <!-- Używamy emoji czarnej gwiazdki jako ikonki dla spójności ze stylem -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>★</text></svg>">
-
-    <!-- Meta Tagi dla Messengera, WhatsAppa, iMessage (Open Graph) -->
-    <meta property="og:title" content="Wyjątkowe Zaproszenie - 18 Asi! 🪩">
-    <meta property="og:description" content="Kliknij w link, otwórz kopertę i potwierdź swoją obecność. Do zobaczenia 7 sierpnia!">
-    <!-- Podmień 'foto_asia.png' na link do wybranego, ładnego zdjęcia, które ma się wyświetlać jako podgląd w wiadomości -->
-    <meta property="og:image" content="foto_asia.png">
-    <meta property="og:type" content="website">
-    
-    <!-- Biblioteka AOS (Animacje przy scrollowaniu) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="locked-scroll"> <!-- Klasa blokująca scroll na starcie -->
+<body class="locked-scroll">
 
-    <!-- ================= EKRAN STARTOWY (KOPERTA) ================= -->
+    <!-- EKRAN STARTOWY (RÓŻOWA KOPERTA) -->
     <div id="intro-screen">
-        <h2 class="intro-title">WYJĄTKOWE ZAPROSZENIE</h2>
-        
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope">
                 <div class="envelope-front"></div>
                 <div class="envelope-flap"></div>
             </div>
-            <!-- Woskowana pieczęć ze wzoru -->
             <div class="wax-seal">
                 <i class="fa-solid fa-star"></i>
                 <span>OPEN</span>
             </div>
         </div>
-        
-        <p class="intro-hint">KLIKNIJ W KOPERTĘ, ABY OTWORZYĆ</p>
-        
+        <p class="intro-hint">KLIKNIJ KOPERTĘ, ABY OTWORZYĆ</p>
     </div>
 
-    <!-- ================= GŁÓWNE ZAPROSZENIE (SCROLLOWANE) ================= -->
+    <!-- GŁÓWNE ZAPROSZENIE (JASNE I RÓŻOWE) -->
     <main id="main-content" class="hidden">
         
-        <!-- SEKCJA 1: HERO -->
         <section class="hero-section" data-aos="fade-up" data-aos-duration="1000">
-            <div class="floating-deco deco-1">🪩</div>
-            <div class="floating-deco deco-2">🎈</div>
-            
-            <p class="subtitle">IT'S MY BIRTHDAY!</p>
+            <p class="subtitle">IT'S MY BIRTHDAY</p>
             <h1 class="main-title">ASIA</h1>
             
             <div class="date-row">
@@ -71,55 +47,31 @@
             <div class="time">17:00</div>
             
             <div class="photo-wrapper">
-                <div class="floating-deco deco-3">🍸</div>
-                <!-- PODMIEŃ ZDJĘCIE (najlepiej czarno-białe bez tła dla spójności) -->
-                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/300x400/eeeeee/000000?text=Foto+Asi';">
+                <!-- Zdjęcie w pełnych kolorach -->
+                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/300x400/fce4e9/c95c75?text=Foto+Asi';">
             </div>
         </section>
 
-        <!-- PRZERYWANA LINIA -->
-        <hr class="dashed-divider" data-aos="zoom-in">
-
-        <!-- SEKCJA 2: SPOTIFY (STREFA DJ) -->
-        <section class="spotify-section" data-aos="fade-up">
-            <div class="floating-deco deco-4">🪩</div>
-            
-            <h2 class="section-title">STREFA DJ !!</h2>
-            
-            <div class="spotify-container">
-                <a href="https://open.spotify.com/playlist/0viH7mv4vzRgW87Hf2tHqp?si=hOtGNF3YT0-lnOH2Munlxg&pt=e83440ecf97b9ad57c2f1b7b91eb7056" target="_blank" class="spotify-big-btn">
-                    <i class="fa-brands fa-spotify"></i>
-                </a>
-                <div class="arrow-hint">
-                    <i class="fa-solid fa-arrow-turn-down fa-rotate-90"></i>
-                    <span>KLIKNIJ W LOGO</span>
-                </div>
-            </div>
-            
-            <p class="spotify-desc">DODAJ MUZYKĘ, KTÓRĄ CHCESZ USŁYSZEĆ NA MOJEJ IMPREZIE</p>
-        </section>
-
-        <!-- PRZERYWANA LINIA -->
-        <hr class="dashed-divider" data-aos="zoom-in">
-
-        <!-- SEKCJA 3: AKCJE (BOTTOM MENU) -->
+        <!-- SEKCJA AKCJI I LINKÓW -->
         <section class="action-section" data-aos="fade-up">
-            <div class="floating-deco deco-5">🍒</div>
             
-            <div class="torn-paper-title">
-                <h3>LICZĘ NA CIEBIE!</h3>
-            </div>
-            
-            <div class="no-pink-alert">
-                Prośba: <strong>NIE ZAKŁADAMY RÓŻOWEGO</strong> 🚫
+            <!-- SELF DJ -->
+            <div class="dj-section">
+                <h2 class="section-title">SELF DJ!</h2>
+                <!-- Link do Google Docs, tak jak Asia prosiła -->
+                <a href="TUTAJ_WKLEJ_LINK_DO_GOOGLE_DOCS_ZE_SPOTIFY" target="_blank" class="spotify-btn">
+                    <i class="fa-brands fa-spotify"></i> Dodaj swoje nutki
+                </a>
             </div>
 
+            <!-- SZCZEGÓŁY -->
+            <h2 class="section-title details-title">DETAILS</h2>
+            
             <div class="action-grid">
                 <!-- LOKALIZACJA -->
                 <div class="action-item">
-                    <a href="https://www.google.com/maps?q=Stara+chatka+-+Wesela+w+rustykalnej+stodole,+Szopena+1b,+22-600+Tomasz%C3%B3w+Lubelski&ftid=0x4724af7947ab40af:0x24c7af3cd035683e&entry=gps&shh=CAE&lucs=,94297699,94231188,94280568,47071704,94218641,94282134,100813464,94286869&g_ep=CAISEjI2LjI1LjMuOTMyMTI1MTg3MBgAIIgnKkksOTQyOTc2OTksOTQyMzExODgsOTQyODA1NjgsNDcwNzE3MDQsOTQyMTg2NDEsOTQyODIxMzQsMTAwODEzNDY0LDk0Mjg2ODY5QgJQTA%3D%3D&skid=fd51a97c-431d-4356-a5b3-ddd26634657c&g_st=ic
-                    " class="round-btn"><i class="fa-solid fa-location-dot"></i></a>
-                    <span class="action-label">LOKALIZACJA</span>
+                    <a href="#" class="round-btn"><i class="fa-solid fa-location-dot"></i></a>
+                    <span class="action-label">MIEJSCE</span>
                 </div>
                 
                 <!-- DRESS CODE -->
@@ -131,14 +83,15 @@
                 <!-- RSVP -->
                 <div class="action-item">
                     <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-btn"><i class="fa-solid fa-check"></i></a>
-                    <span class="action-label">POTWIERDŹ</span>
+                    <span class="action-label">POTWIERDZENIE<br>OBECNOŚCI</span>
                 </div>
             </div>
+            
         </section>
         
     </main>
 
-    <!-- Skrypt AOS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 </body>
