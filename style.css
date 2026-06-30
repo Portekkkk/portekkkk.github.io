@@ -18,7 +18,11 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-dark);
     overflow-x: hidden;
+    cursor: crosshair;
     /* Domyślnie blokujemy scrollowanie póki koperta jest widoczna */
+}
+a, .envelope-wrapper {
+    cursor: pointer; 
 }
 
 body.locked-scroll {
@@ -49,11 +53,30 @@ body.locked-scroll {
     margin-bottom: 50px;
     font-weight: 700;
     text-align: center;
-    /* Srebrny, luksusowy gradient na tekście */
-    background: linear-gradient(to right, #888888, #ffffff, #888888);
+    
+    /* Zaktualizowany gradient do animacji */
+    background: linear-gradient(
+        to right, 
+        #666666 20%, 
+        #ffffff 40%, 
+        #ffffff 60%, 
+        #666666 80%
+    );
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0px 4px 15px rgba(255, 255, 255, 0.1);
+    
+    /* Animacja błysku */
+    animation: shine 4s linear infinite;
+}
+
+/* Keyframes dla błysku (dodaj pod spodem) */
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
 }
 
 .intro-hint {
@@ -375,4 +398,15 @@ section {
     .arrow-hint { display: none; } /* Ukrywamy strzałkę na bardzo wąskich ekranach */
     .action-grid { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; }
     .action-item { width: 40%; }
+}
+
+/* --- FILM GRAIN (SZUM W TLE) --- */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 99999; /* Musi być nad wszystkim */
+    pointer-events: none; /* Żeby nie blokowało klikania! */
+    opacity: 0.04; /* Bardzo delikatna przezroczystość */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
