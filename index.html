@@ -5,82 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>18 Urodziny Asi!</title>
     
-    <!-- Fonty i Ikony -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Fonty: Elegancki szeryfowy i czysty bezszeryfowy -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Ikony FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Twój plik CSS -->
+    <!-- Biblioteka AOS (Animacje przy scrollowaniu) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- EKRAN STARTOWY: KOPERTA -->
+<body class="locked-scroll"> <!-- Klasa blokująca scroll na starcie -->
+
+    <!-- ================= EKRAN STARTOWY (KOPERTA) ================= -->
     <div id="intro-screen">
-        <p class="tap-text">Kliknij, aby otworzyć zaproszenie</p>
+        <h2 class="intro-title">WYJĄTKOWE ZAPROSZENIE</h2>
+        
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope">
                 <div class="envelope-front"></div>
                 <div class="envelope-flap"></div>
             </div>
-            <div class="letter">
-                <span class="letter-text">Dla Ciebie</span>
+            <!-- Woskowana pieczęć ze wzoru -->
+            <div class="wax-seal">
+                <i class="fa-solid fa-star"></i>
+                <span>OPEN</span>
             </div>
-            <div class="wax-seal">OPEN</div>
         </div>
+        
+        <p class="intro-hint">KLIKNIJ W KOPERTĘ, ABY OTWORZYĆ</p>
+        
+        <!-- Ozdobniki tła -->
+        <div class="intro-deco top-right">🪩</div>
+        <div class="intro-deco bottom-left">🪩</div>
     </div>
 
-    <!-- GŁÓWNA ZAWARTOŚĆ: ZAPROSZENIE -->
+    <!-- ================= GŁÓWNE ZAPROSZENIE (SCROLLOWANE) ================= -->
     <main id="main-content" class="hidden">
-        <div class="glass-container">
-            <div class="deco-emoji deco-top">🌸</div>
+        
+        <!-- SEKCJA 1: HERO -->
+        <section class="hero-section" data-aos="fade-up" data-aos-duration="1000">
+            <div class="floating-deco deco-1">🪩</div>
+            <div class="floating-deco deco-2">🎈</div>
             
-            <p class="subtitle">It's my birthday</p>
-            <h1 class="title">ASIA</h1>
+            <p class="subtitle">IT'S MY BIRTHDAY!</p>
+            <h1 class="main-title">ASIA</h1>
             
-            <div class="event-date">
-                <span>PIĄTEK</span>
+            <div class="date-row">
+                <span class="day">PIĄTEK</span>
                 <span class="separator">|</span>
-                <span class="highlight-date">07</span>
+                <span class="number">07</span>
                 <span class="separator">|</span>
-                <span>SIERPNIA</span>
+                <span class="month">SIERPNIA</span>
             </div>
             
-            <div class="event-time">17:00</div>
-
+            <div class="time">17:00</div>
+            
             <div class="photo-wrapper">
-                <!-- Podmień 'foto_asia.png' na swoje zdjęcie bez tła -->
-                <img src="foto_asia.png" alt="Jubilatka Asia" id="birthday-girl" onerror="this.src='https://via.placeholder.com/250x250/fce4e9/c95c75?text=Foto+Asi';">
+                <div class="floating-deco deco-3">🍸</div>
+                <!-- PODMIEŃ ZDJĘCIE (najlepiej czarno-białe bez tła dla spójności) -->
+                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/300x400/eeeeee/000000?text=Foto+Asi';">
             </div>
+        </section>
 
-            <div class="dress-code-alert">
-                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
-                <div class="alert-text">
-                    <p>Ogromna prośba:</p>
-                    <p class="strike-through">NIE ZAKŁADAMY RÓŻOWEGO! 👗🚫</p>
+        <!-- PRZERYWANA LINIA -->
+        <hr class="dashed-divider" data-aos="zoom-in">
+
+        <!-- SEKCJA 2: SPOTIFY (STREFA DJ) -->
+        <section class="spotify-section" data-aos="fade-up">
+            <div class="floating-deco deco-4">🪩</div>
+            
+            <h2 class="section-title">STREFA DJ !!</h2>
+            
+            <div class="spotify-container">
+                <a href="https://open.spotify.com/playlist/0viH7mv4vzRgW87Hf2tHqp?si=hOtGNF3YT0-lnOH2Munlxg&pt=e83440ecf97b9ad57c2f1b7b91eb7056" target="_blank" class="spotify-big-btn">
+                    <i class="fa-brands fa-spotify"></i>
+                </a>
+                <div class="arrow-hint">
+                    <i class="fa-solid fa-arrow-turn-down fa-rotate-90"></i>
+                    <span>KLIKNIJ W LOGO</span>
                 </div>
             </div>
+            
+            <p class="spotify-desc">DODAJ MUZYKĘ, KTÓRĄ CHCESZ USŁYSZEĆ NA MOJEJ IMPREZIE</p>
+        </section>
 
-            <div class="action-buttons">
-                <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="btn btn-primary">
-                    <i class="fa-solid fa-check-circle"></i> Potwierdź Obecność
-                </a>
-                
-                <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="btn btn-secondary">
-                    <i class="fa-solid fa-shirt"></i> Szczegóły Dress Code'u
-                </a>
-                
-                <a href="https://open.spotify.com/playlist/0viH7mv4vzRgW87Hf2tHqp?si=hOtGNF3YT0-lnOH2Munlxg&pt=e83440ecf97b9ad57c2f1b7b91eb7056" target="_blank" class="btn btn-spotify">
-                    <i class="fa-brands fa-spotify"></i> Self DJ - Dodaj Nutki
-                </a>
+        <!-- PRZERYWANA LINIA -->
+        <hr class="dashed-divider" data-aos="zoom-in">
+
+        <!-- SEKCJA 3: AKCJE (BOTTOM MENU) -->
+        <section class="action-section" data-aos="fade-up">
+            <div class="floating-deco deco-5">🍒</div>
+            
+            <div class="torn-paper-title">
+                <h3>LICZĘ NA CIEBIE!</h3>
             </div>
             
-            <div class="deco-emoji deco-bottom">🪩🥂</div>
-        </div>
+            <div class="no-pink-alert">
+                Prośba: <strong>NIE ZAKŁADAMY RÓŻOWEGO</strong> 🚫
+            </div>
+
+            <div class="action-grid">
+                <!-- LOKALIZACJA -->
+                <div class="action-item">
+                    <a href="#" class="round-btn"><i class="fa-solid fa-location-dot"></i></a>
+                    <span class="action-label">LOKALIZACJA</span>
+                </div>
+                
+                <!-- DRESS CODE -->
+                <div class="action-item">
+                    <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-btn"><i class="fa-solid fa-user-tie"></i></a>
+                    <span class="action-label">DRESS CODE</span>
+                </div>
+                
+                <!-- RSVP -->
+                <div class="action-item">
+                    <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-btn"><i class="fa-solid fa-check"></i></a>
+                    <span class="action-label">POTWIERDŹ</span>
+                </div>
+            </div>
+        </section>
+        
     </main>
 
-    <!-- Zewnętrzna biblioteka do konfetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <!-- Twój plik JS -->
+    <!-- Skrypt AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
