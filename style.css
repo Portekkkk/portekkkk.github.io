@@ -1,8 +1,9 @@
 :root {
-    --bg-pink: #fdf2f5;
-    --envelope-pink: #f8cdd6;
-    --text-dark: #4a2c35;
-    --accent-pink: #c95c75;
+    --bg-light-pink: #fdf5f7; /* Tło strony z projektu */
+    --text-pink: #c97b8f; /* Kolor liter ASIA i ikon */
+    --text-light-pink: #d89aa9;
+    --envelope-body: #fce4e9;
+    --envelope-flap: #f4b8c5;
 }
 
 * {
@@ -13,8 +14,8 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: var(--bg-pink);
-    color: var(--text-dark);
+    background-color: var(--bg-light-pink);
+    color: var(--text-pink);
     overflow-x: hidden;
 }
 
@@ -23,11 +24,11 @@ body.locked-scroll {
     height: 100vh;
 }
 
-/* --- EKRAN STARTOWY --- */
+/* ================= EKRAN STARTOWY (JASNORÓŻOWY) ================= */
 #intro-screen {
     position: fixed;
     inset: 0;
-    background-color: var(--bg-pink);
+    background-color: var(--bg-light-pink);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -40,9 +41,8 @@ body.locked-scroll {
     margin-top: 40px;
     font-size: 0.9rem;
     letter-spacing: 2px;
-    color: var(--accent-pink);
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
+    color: var(--text-pink);
+    font-weight: 600;
     animation: pulse 2s infinite;
 }
 
@@ -63,9 +63,9 @@ body.locked-scroll {
 .envelope {
     position: absolute;
     inset: 0;
-    background: #fce4e9;
+    background: var(--envelope-body);
     border-radius: 4px;
-    box-shadow: 0 15px 30px rgba(201, 92, 117, 0.15);
+    box-shadow: 0 15px 30px rgba(201, 123, 143, 0.2);
 }
 
 .envelope-front {
@@ -74,9 +74,9 @@ body.locked-scroll {
     left: 0;
     width: 0;
     height: 0;
-    border-left: 150px solid #fce4e9;
-    border-right: 150px solid #fce4e9;
-    border-bottom: 100px solid #f4b8c5;
+    border-left: 150px solid #fae8ec;
+    border-right: 150px solid #fae8ec;
+    border-bottom: 100px solid #f2bac5;
     z-index: 3;
 }
 
@@ -88,20 +88,21 @@ body.locked-scroll {
     height: 0;
     border-left: 150px solid transparent;
     border-right: 150px solid transparent;
-    border-top: 110px solid #f1aebd;
+    border-top: 110px solid var(--envelope-flap);
     z-index: 4;
     transform-origin: top;
     transition: transform 0.6s ease-in-out;
 }
 
+/* Różowa pieczęć */
 .wax-seal {
     position: absolute;
     top: 85px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-    background: #fff;
-    color: var(--accent-pink);
+    background: var(--text-pink);
+    color: #fff;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -110,11 +111,10 @@ body.locked-scroll {
     justify-content: center;
     align-items: center;
     font-size: 0.6rem;
-    border: 2px dashed var(--accent-pink);
+    box-shadow: 0 4px 10px rgba(201, 123, 143, 0.4);
     transition: opacity 0.3s;
 }
-
-.wax-seal i { font-size: 1rem; margin-bottom: 2px; }
+.wax-seal i { font-size: 1.1rem; margin-bottom: 2px; }
 
 .envelope-wrapper.is-open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
 .envelope-wrapper.is-open .wax-seal { opacity: 0; }
@@ -124,11 +124,9 @@ body.locked-scroll {
     50% { opacity: 1; }
 }
 
-/* --- GŁÓWNA STRONA --- */
+/* ================= GŁÓWNA STRONA ================= */
 #main-content {
-    background-color: var(--bg-pink);
     min-height: 100vh;
-    padding-bottom: 50px;
 }
 
 #main-content.hidden {
@@ -137,25 +135,55 @@ body.locked-scroll {
 }
 
 section {
+    position: relative;
     max-width: 500px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 50px 20px;
     text-align: center;
+    /* TUTAJ ZALECAM DODAĆ WYEKSPORTOWANE TŁA:
+       background-image: url('tlo_1.jpg');
+       background-size: cover;
+    */
 }
 
+/* --- TYPOGRAFIA --- */
 .subtitle {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     letter-spacing: 3px;
-    color: #8c6b76;
-    margin-bottom: 10px;
+    color: var(--text-light-pink);
+    margin-bottom: 15px;
+    text-transform: uppercase;
 }
 
 .main-title {
     font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    color: var(--accent-pink);
-    margin-bottom: 20px;
+    font-size: 5.5rem;
+    font-weight: 400;
+    color: var(--text-pink);
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+/* Kropka nad 'I' w formie serduszka (trik CSS) */
+.heart-dot {
+    position: relative;
+    display: inline-block;
+}
+.heart-dot::after {
+    content: "♥";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    color: var(--text-pink);
+}
+
+.separator-bow, .separator-bow-small {
+    font-size: 1.5rem;
+    color: var(--text-pink);
+    margin: 15px 0;
+    opacity: 0.7;
 }
 
 .date-row {
@@ -163,74 +191,72 @@ section {
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    border-top: 1px solid var(--accent-pink);
-    border-bottom: 1px solid var(--accent-pink);
-    padding: 10px 0;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 400;
+    font-family: 'Playfair Display', serif;
 }
-.date-row .number { font-size: 1.8rem; color: var(--accent-pink); }
+.date-row .number { font-size: 2.2rem; font-weight: 600; }
+.date-row .separator { opacity: 0.4; }
+
+.separator-leaves {
+    font-size: 1.2rem;
+    margin: 15px 0;
+    opacity: 0.8;
+}
 
 .time {
     font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    color: var(--accent-pink);
-    margin-bottom: 30px;
+    font-size: 2.8rem;
+    color: var(--text-pink);
+    margin-bottom: 40px;
 }
 
+/* ZDJĘCIE WYCIĘTE W TLE */
 .photo-wrapper {
-    width: 250px;
-    height: 250px;
-    margin: 0 auto;
-    border-radius: 50%;
-    padding: 8px;
-    background: #fff;
-    box-shadow: 0 15px 35px rgba(201, 92, 117, 0.2);
-}
-
-.photo-wrapper img {
+    position: relative;
     width: 100%;
+    height: 350px;
+    display: flex;
+    justify-content: flex-end; /* Zdjęcie dociska do prawej jak na projekcie */
+    margin-top: -30px;
+}
+.photo-wrapper img {
     height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    filter: none; /* Przywrócenie kolorów zdjęcia */
+    width: auto;
+    object-fit: contain;
 }
 
-/* --- SEKCJE AKCJI --- */
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--accent-pink);
+/* --- SEKCJA 2 --- */
+.handwritten-title {
+    font-family: 'Amatic SC', cursive;
+    font-size: 4rem;
+    color: var(--text-pink);
     margin-bottom: 20px;
-}
-.details-title { margin-top: 40px; }
-
-.dj-section {
-    background: #fff;
-    padding: 30px 20px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(201, 92, 117, 0.1);
-    margin-bottom: 30px;
+    letter-spacing: 2px;
 }
 
-.spotify-btn {
-    display: inline-flex;
+.dj-container {
+    margin-bottom: 40px;
+}
+
+/* Gigantyczny przycisk Spotify */
+.spotify-circle-btn {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    background: #1DB954;
+    width: 130px;
+    height: 130px;
+    background-color: var(--text-pink);
     color: #fff;
-    padding: 15px 25px;
-    border-radius: 30px;
+    border-radius: 50%;
+    font-size: 4.5rem;
+    margin: 0 auto;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
     transition: transform 0.3s, box-shadow 0.3s;
 }
-.spotify-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(29, 185, 84, 0.3);
+.spotify-circle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(201, 123, 143, 0.4);
 }
 
 .action-grid {
@@ -238,35 +264,36 @@ section {
     justify-content: space-around;
     align-items: flex-start;
     gap: 10px;
+    margin-top: 30px;
 }
 
 .action-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     width: 30%;
 }
 
-.round-btn {
+.round-icon-btn {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 70px;
     height: 70px;
-    background-color: #fff;
-    color: var(--accent-pink);
+    background-color: var(--text-pink);
+    color: #fff;
     border-radius: 50%;
-    font-size: 1.8rem;
+    font-size: 2rem;
     text-decoration: none;
-    box-shadow: 0 5px 15px rgba(201, 92, 117, 0.15);
     transition: transform 0.3s;
 }
-.round-btn:hover { transform: scale(1.1); background-color: var(--accent-pink); color: #fff; }
+.round-icon-btn:hover { transform: scale(1.1); }
 
 .action-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-align: center;
-    color: var(--text-dark);
+    text-transform: uppercase;
+    color: var(--text-pink);
 }
