@@ -1,5 +1,4 @@
 :root {
-    --bg-light-pink: #fdf5f7; 
     --text-pink: #c97b8f; 
     --text-light-pink: #d89aa9;
     --envelope-body: #fce4e9;
@@ -14,9 +13,17 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: var(--bg-light-pink);
     color: var(--text-pink);
     overflow-x: hidden;
+    
+    /* PUDROWE TŁO Z GRADIENTÓW I TEKSTURĄ */
+    background-color: #fdf5f7;
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(250, 218, 226, 0.8) 0%, transparent 40%),
+        radial-gradient(circle at 90% 5%, rgba(244, 184, 197, 0.6) 0%, transparent 50%),
+        radial-gradient(circle at 80% 90%, rgba(242, 186, 197, 0.7) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    background-attachment: fixed; /* Tło zostaje w miejscu przy scrollowaniu */
 }
 
 body.locked-scroll {
@@ -28,7 +35,7 @@ body.locked-scroll {
 #intro-screen {
     position: fixed;
     inset: 0;
-    background-color: var(--bg-light-pink);
+    background-color: #fdf5f7; /* Jednolite różowe tło dla intro */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -120,11 +127,13 @@ body.locked-scroll {
     50% { opacity: 1; }
 }
 
-/* ================= GŁÓWNA STRONA (SCROLL) ================= */
+/* ================= GŁÓWNA STRONA ================= */
 #main-content {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding-bottom: 50px;
 }
 
 #main-content.hidden {
@@ -132,75 +141,36 @@ body.locked-scroll {
     opacity: 0;
 }
 
-/* MAGICZNY KONTENER - Wymusza scrollowanie */
-.canvas-wrapper {
-    position: relative;
+section {
     width: 100%;
-    max-width: 550px; 
-    
-    /* Gwarancja, że strona zawsze jest wyższa niż ekran = wymuszony scroll */
-    min-height: 1000px;
-    height: 130vh; 
-    
-    background-image: url('tlo.png'); /* TWOJE TŁO Z KWIATAMI */
-    
-    /* 100% 100% sprawia, że grafika dopasowuje się do tej nowej, długiej wysokości,
-       dzięki czemu przyciski nigdy "nie uciekną" z wieńców podczas powiększania ekranu */
-    background-size: 100% 100%; 
-    background-position: top center;
-    background-repeat: no-repeat;
-    overflow: hidden;
-}
-
-/* --- POZYCJONOWANIE BLOKÓW NA OBRAZKU --- */
-/* (Wartości 'top' możesz w razie potrzeby skorygować o 1-2%, aby trafić idealnie) */
-
-.header-block {
-    position: absolute;
-    top: 5%; 
-    width: 100%;
+    max-width: 500px;
+    padding: 0 20px;
+    margin-bottom: 60px;
     text-align: center;
 }
 
-.dj-block {
-    position: absolute;
-    top: 32%; /* Wysokość pierwszego wieńca */
-    width: 100%;
-    text-align: center;
+/* Ozdobniki między elementami */
+.separator-bow, .separator-bow-small { font-size: 1.5rem; opacity: 0.7; margin: 15px 0; }
+.separator-leaves { font-size: 1.2rem; opacity: 0.8; margin: 15px 0; }
+.footer-deco { font-size: 1.5rem; opacity: 0.7; margin-top: 50px; letter-spacing: 15px; }
+
+/* --- HERO SECTION --- */
+.hero-section {
+    padding-top: 8vh; /* Płynne zsunięcie z góry ekranu */
 }
 
-.details-block {
-    position: absolute;
-    top: 58%; /* Wysokość trzech dolnych wieńców */
-    width: 100%;
-    text-align: center;
-}
-
-.photo-block {
-    position: absolute;
-    bottom: 0; 
-    left: 5%;
-    width: 45%; 
-}
-
-.photo-block img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-/* --- WYGLĄD ELEMENTÓW --- */
 .subtitle {
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-size: 1.1rem;
     letter-spacing: 3px;
     color: var(--text-light-pink);
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
 }
 
 .main-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3.5rem, 12vw, 5rem);
-    color: var(--text-pink);
+    font-size: 5rem;
+    font-weight: 400;
     line-height: 1;
 }
 
@@ -214,8 +184,7 @@ body.locked-scroll {
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: clamp(1rem, 4vw, 1.5rem);
-    color: var(--text-pink);
+    font-size: 1.5rem;
 }
 
 .date-row {
@@ -224,75 +193,97 @@ body.locked-scroll {
     align-items: center;
     gap: 15px;
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.1rem, 4vw, 1.3rem);
-    margin: 10px 0;
+    font-size: 1.3rem;
 }
-.date-row .number { font-size: clamp(1.8rem, 6vw, 2.2rem); font-weight: 600; }
+.date-row .number { font-size: 2.2rem; font-weight: 600; }
 .date-row .separator { opacity: 0.4; }
 
 .time {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 7vw, 2.5rem);
-    color: var(--text-pink);
+    font-size: 2.8rem;
+    margin-bottom: 30px;
 }
 
+.photo-wrapper {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    border-radius: 20px;
+    /* Delikatne, eleganckie obramowanie wokół zdjęcia */
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 30px rgba(201, 123, 143, 0.15);
+}
+.photo-wrapper img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    object-fit: cover;
+}
+
+/* --- TYPOGRAFIA (Napisy pędzlem) --- */
 .handwritten-title {
     font-family: 'Amatic SC', cursive;
-    font-size: clamp(3rem, 8vw, 3.5rem);
-    color: var(--text-pink);
-    margin-bottom: 10px;
+    font-size: 4rem;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
 }
 
+/* --- PRZYCISKI --- */
 .spotify-circle-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: clamp(90px, 25vw, 120px);
-    height: clamp(90px, 25vw, 120px);
+    width: 130px;
+    height: 130px;
     background-color: var(--text-pink);
     color: #fff;
     border-radius: 50%;
-    font-size: clamp(3rem, 10vw, 4.5rem);
+    font-size: 4.5rem;
     margin: 0 auto;
     text-decoration: none;
-    transition: transform 0.3s;
-    box-shadow: 0 5px 15px rgba(201, 123, 143, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 10px 25px rgba(201, 123, 143, 0.2);
 }
-.spotify-circle-btn:hover { transform: scale(1.05); }
+.spotify-circle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 35px rgba(201, 123, 143, 0.4);
+}
 
 .action-grid {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 0 20px;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .action-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    width: 30%;
 }
 
 .round-icon-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: clamp(55px, 14vw, 70px);
-    height: clamp(55px, 14vw, 70px);
+    width: 70px;
+    height: 70px;
     background-color: var(--text-pink);
     color: #fff;
     border-radius: 50%;
-    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    font-size: 2rem;
     text-decoration: none;
     transition: transform 0.3s;
-    box-shadow: 0 5px 10px rgba(201, 123, 143, 0.3);
+    box-shadow: 0 8px 20px rgba(201, 123, 143, 0.2);
 }
 .round-icon-btn:hover { transform: scale(1.1); }
 
 .action-label {
-    font-size: clamp(0.6rem, 2vw, 0.75rem);
+    font-size: 0.75rem;
     font-weight: 600;
     text-align: center;
-    color: var(--text-pink);
+    text-transform: uppercase;
 }
