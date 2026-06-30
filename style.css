@@ -309,3 +309,9 @@ section {
     text-transform: uppercase;
     color: var(--text-pink);
 }
+
+.hero-section {
+    background-image: url('bg-hero.png');
+    background-size: cover;
+    background-position: center;
+}
