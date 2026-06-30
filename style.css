@@ -310,8 +310,32 @@ section {
     color: var(--text-pink);
 }
 
+/* --- Zaktualizuj tło dla pierwszej sekcji (Góra) --- */
 .hero-section {
-    background-image: url('bg-hero.png');
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 50px 20px;
+    text-align: center;
+    /* PODMIEŃ ŚCIEŻKĘ NA SWÓJ PLIK Z TŁEM (wygenerowanym obrazkiem 22) */
+    background-image: url('tlo_zaproszenia.png'); 
     background-size: cover;
     background-position: center;
+    /* Dodaj minimalną wysokość, żeby sekcja była duża jak tło */
+    min-height: 100vh;
+}
+
+/* --- Zaktualizuj tło dla drugiej sekcji (Dół) --- */
+.details-section {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 50px 20px;
+    text-align: center;
+    /* PODMIEŃ ŚCIEŻKĘ NA TEN SAM PLIK LUB PLIK DLA DRUGIEJ GRAFIKI */
+    background-image: url('tlo_details.png'); 
+    background-size: cover;
+    background-position: center;
+    /* Dodaj minimalną wysokość, żeby sekcja była duża jak tło */
+    min-height: 100vh;
 }
