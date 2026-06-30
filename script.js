@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof confetti === 'function') {
             setTimeout(() => {
                 confetti({
-                    particleCount: 120,
-                    spread: 80,
+                    particleCount: 100,
+                    spread: 70,
                     origin: { y: 0.6 },
-                    colors: ['#c95c75', '#f1aebd', '#ffffff', '#ffd700']
+                    colors: ['#c95c75', '#f1aebd', '#ffffff'] 
                 });
             }, 400);
         }
@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 mainContent.style.opacity = '1';
                 
-                // URUCHOMIENIE ANIMACJI PRZY SCROLLU (AOS)
+                // Inicjalizacja płynnych animacji przy przewijaniu
                 AOS.init({
-                    once: false, // Animacje powtarzają się przy przewijaniu góra/dół
-                    offset: 50,  // Czułość pojawiania się elementów
+                    once: false, 
+                    offset: 30,  
                 });
                 
             }, 1000);
