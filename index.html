@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18 Urodziny Asi!</title>
+    
+    <!-- Fonty i Ikony -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Twój plik CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- EKRAN STARTOWY: KOPERTA -->
+    <div id="intro-screen">
+        <p class="tap-text">Kliknij, aby otworzyć zaproszenie</p>
+        <div class="envelope-wrapper" id="envelope">
+            <div class="envelope">
+                <div class="envelope-front"></div>
+                <div class="envelope-flap"></div>
+            </div>
+            <div class="letter">
+                <span class="letter-text">Dla Ciebie</span>
+            </div>
+            <div class="wax-seal">OPEN</div>
+        </div>
+    </div>
+
+    <!-- GŁÓWNA ZAWARTOŚĆ: ZAPROSZENIE -->
+    <main id="main-content" class="hidden">
+        <div class="glass-container">
+            <div class="deco-emoji deco-top">🌸</div>
+            
+            <p class="subtitle">It's my birthday</p>
+            <h1 class="title">ASIA</h1>
+            
+            <div class="event-date">
+                <span>PIĄTEK</span>
+                <span class="separator">|</span>
+                <span class="highlight-date">07</span>
+                <span class="separator">|</span>
+                <span>SIERPNIA</span>
+            </div>
+            
+            <div class="event-time">17:00</div>
+
+            <div class="photo-wrapper">
+                <!-- Podmień 'foto_asia.png' na swoje zdjęcie bez tła -->
+                <img src="foto_asia.png" alt="Jubilatka Asia" id="birthday-girl" onerror="this.src='https://via.placeholder.com/250x250/fce4e9/c95c75?text=Foto+Asi';">
+            </div>
+
+            <div class="dress-code-alert">
+                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                <div class="alert-text">
+                    <p>Ogromna prośba:</p>
+                    <p class="strike-through">NIE ZAKŁADAMY RÓŻOWEGO! 👗🚫</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="btn btn-primary">
+                    <i class="fa-solid fa-check-circle"></i> Potwierdź Obecność
+                </a>
+                
+                <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="btn btn-secondary">
+                    <i class="fa-solid fa-shirt"></i> Szczegóły Dress Code'u
+                </a>
+                
+                <a href="https://open.spotify.com/playlist/0viH7mv4vzRgW87Hf2tHqp?si=hOtGNF3YT0-lnOH2Munlxg&pt=e83440ecf97b9ad57c2f1b7b91eb7056" target="_blank" class="btn btn-spotify">
+                    <i class="fa-brands fa-spotify"></i> Self DJ - Dodaj Nutki
+                </a>
+            </div>
+            
+            <div class="deco-emoji deco-bottom">🪩🥂</div>
+        </div>
+    </main>
+
+    <!-- Zewnętrzna biblioteka do konfetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Twój plik JS -->
+    <script src="script.js"></script>
+</body>
+</html>
