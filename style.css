@@ -1,10 +1,8 @@
-/* --- ZMIENNE --- */
 :root {
-    --bg-dark: #000000;
-    --bg-light: #f8f8f8;
-    --text-dark: #111111;
-    --text-light: #ffffff;
-    --envelope-color: #222222;
+    --bg-pink: #fdf2f5;
+    --envelope-pink: #f8cdd6;
+    --text-dark: #4a2c35;
+    --accent-pink: #c95c75;
 }
 
 * {
@@ -15,14 +13,9 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: var(--bg-dark);
+    background-color: var(--bg-pink);
     color: var(--text-dark);
     overflow-x: hidden;
-    cursor: crosshair;
-    /* Domyślnie blokujemy scrollowanie póki koperta jest widoczna */
-}
-a, .envelope-wrapper {
-    cursor: pointer; 
 }
 
 body.locked-scroll {
@@ -30,15 +23,11 @@ body.locked-scroll {
     height: 100vh;
 }
 
-/* =========================================
-   EKRAN 1: KOPERTA (PREMIUM GLAMOUR)
-========================================= */
+/* --- EKRAN STARTOWY --- */
 #intro-screen {
     position: fixed;
     inset: 0;
-    /* Dodajemy delikatny, kinowy "spotlight" na środku ekranu */
-    background: radial-gradient(circle at center, #1f1f1f 0%, var(--bg-dark) 60%);
-    color: var(--text-light);
+    background-color: var(--bg-pink);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -47,82 +36,47 @@ body.locked-scroll {
     transition: opacity 1s ease, visibility 1s ease;
 }
 
-.intro-title {
-    font-size: 1.8rem;
-    letter-spacing: 6px;
-    margin-bottom: 50px;
-    font-weight: 700;
-    text-align: center;
-    
-    /* Zaktualizowany gradient do animacji */
-    background: linear-gradient(
-        to right, 
-        #666666 20%, 
-        #ffffff 40%, 
-        #ffffff 60%, 
-        #666666 80%
-    );
-    background-size: 200% auto;
-    color: #000;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-    /* Animacja błysku */
-    animation: shine 4s linear infinite;
-}
-
-/* Keyframes dla błysku (dodaj pod spodem) */
-@keyframes shine {
-    to {
-        background-position: 200% center;
-    }
-}
-
 .intro-hint {
-    margin-top: 60px;
-    font-size: 0.8rem;
-    letter-spacing: 3px;
-    opacity: 0.6;
-    text-transform: uppercase;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--accent-pink);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    animation: pulse 2s infinite;
 }
 
-/* KOPERTA Z EFEKTEM 3D I BLASKIEM */
+/* KOPERTA */
 .envelope-wrapper {
     position: relative;
-    width: 320px;
-    height: 220px;
+    width: 300px;
+    height: 200px;
     cursor: pointer;
     perspective: 1200px;
-    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* Delikatna, rozmyta poświata dookoła koperty */
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.08));
+    transition: transform 0.3s;
 }
 
 .envelope-wrapper:hover {
-    /* Koperta unosi się i lekko pochyla do użytkownika (efekt 3D) */
-    transform: scale(1.05) translateY(-10px) rotateX(8deg);
-    filter: drop-shadow(0 15px 35px rgba(255, 255, 255, 0.15));
+    transform: scale(1.05);
 }
 
 .envelope {
     position: absolute;
     inset: 0;
-    background: #0a0a0a;
+    background: #fce4e9;
     border-radius: 4px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,1);
+    box-shadow: 0 15px 30px rgba(201, 92, 117, 0.15);
 }
 
-/* Zróżnicowane odcienie szarości symulujące padanie światła (cieniowanie) */
 .envelope-front {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 0;
     height: 0;
-    border-left: 160px solid #171717;  /* Ciemniejszy bok */
-    border-right: 160px solid #141414; /* Najciemniejszy bok */
-    border-bottom: 110px solid #222222; /* Najjaśniejszy dół (odbija światło) */
+    border-left: 150px solid #fce4e9;
+    border-right: 150px solid #fce4e9;
+    border-bottom: 100px solid #f4b8c5;
     z-index: 3;
 }
 
@@ -132,61 +86,49 @@ body.locked-scroll {
     left: 0;
     width: 0;
     height: 0;
-    border-left: 160px solid transparent;
-    border-right: 160px solid transparent;
-    border-top: 120px solid #2a2a2a; /* Górna klapa oświetlona najmocniej */
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 110px solid #f1aebd;
     z-index: 4;
     transform-origin: top;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.3s;
+    transition: transform 0.6s ease-in-out;
 }
 
-/* CHROMOWANA, PULSUJĄCA PIECZĘĆ */
 .wax-seal {
     position: absolute;
-    top: 95px;
+    top: 85px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-    /* Efekt metalicznego srebra/chromu */
-    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #999999 40%, #222222 100%);
-    color: #000;
-    width: 55px;
-    height: 55px;
+    background: #fff;
+    color: var(--accent-pink);
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 0.65rem;
-    font-weight: 900;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    transition: opacity 0.3s ease;
-    /* Wypuszczenie animacji pulsującej obręczy */
-    animation: pulse-glow 2s infinite;
+    font-size: 0.6rem;
+    border: 2px dashed var(--accent-pink);
+    transition: opacity 0.3s;
 }
 
-.wax-seal i { font-size: 1.1rem; margin-bottom: 2px; color: #000; }
+.wax-seal i { font-size: 1rem; margin-bottom: 2px; }
 
-/* Animacja otwierania */
 .envelope-wrapper.is-open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
 .envelope-wrapper.is-open .wax-seal { opacity: 0; }
 
-/* Keyframes dla pulsującej pieczęci */
-@keyframes pulse-glow {
-    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
 }
 
-/* =========================================
-   EKRAN 2: ZAPROSZENIE (SCROLL, LIGHT MODE)
-========================================= */
+/* --- GŁÓWNA STRONA --- */
 #main-content {
-    background-color: var(--bg-light);
+    background-color: var(--bg-pink);
     min-height: 100vh;
     padding-bottom: 50px;
-    overflow: hidden;
 }
 
 #main-content.hidden {
@@ -194,48 +136,26 @@ body.locked-scroll {
     opacity: 0;
 }
 
-/* Ozdobniki rozrzucone po ekranie */
-.floating-deco {
-    position: absolute;
-    font-size: 4rem;
-    filter: grayscale(100%);
-    z-index: 0;
-    opacity: 0.8;
-}
-.deco-1 { top: 20px; left: 10px; }
-.deco-2 { top: 120px; right: 20px; font-size: 3rem; }
-.deco-3 { bottom: 50px; right: 10px; font-size: 2.5rem; }
-.deco-4 { top: -20px; left: -10px; }
-.deco-5 { top: -30px; right: 10px; font-size: 3rem; }
-
-/* Wspólne ustawienia sekcji */
 section {
-    position: relative;
     max-width: 500px;
     margin: 0 auto;
-    padding: 60px 20px;
+    padding: 40px 20px;
     text-align: center;
 }
 
-/* SEKCJA 1 */
 .subtitle {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: #8c6b76;
     margin-bottom: 10px;
-    position: relative;
-    z-index: 1;
 }
 
 .main-title {
     font-family: 'Playfair Display', serif;
-    font-size: 5.5rem;
-    font-weight: 400;
-    line-height: 1;
+    font-size: 5rem;
+    color: var(--accent-pink);
     margin-bottom: 20px;
-    position: relative;
-    z-index: 1;
 }
 
 .date-row {
@@ -243,116 +163,75 @@ section {
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    border-top: 1px solid var(--accent-pink);
+    border-bottom: 1px solid var(--accent-pink);
+    padding: 10px 0;
     margin-bottom: 15px;
 }
-.date-row .number { font-size: 2rem; }
-.date-row .separator { font-weight: 300; opacity: 0.5; }
+.date-row .number { font-size: 1.8rem; color: var(--accent-pink); }
 
 .time {
-    font-size: 2.5rem;
-    font-weight: 900;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent-pink);
     margin-bottom: 30px;
 }
 
 .photo-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
+    width: 250px;
+    height: 250px;
     margin: 0 auto;
-    z-index: 1;
+    border-radius: 50%;
+    padding: 8px;
+    background: #fff;
+    box-shadow: 0 15px 35px rgba(201, 92, 117, 0.2);
 }
+
 .photo-wrapper img {
     width: 100%;
-    height: auto;
-    /* Efekt czarno-biały dla dopasowania do stylu */
-    filter: grayscale(100%) contrast(110%); 
-}
-
-/* PRZERYWANA LINIA */
-.dashed-divider {
-    border: none;
-    border-top: 3px dashed var(--text-dark);
-    width: 90%;
-    max-width: 500px;
-    margin: 0 auto;
-    opacity: 0.3;
-}
-
-/* SEKCJA 2: SPOTIFY */
-.section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2.2rem;
-    font-weight: 900;
-    margin-bottom: 40px;
-}
-
-.spotify-container {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
-}
-
-.spotify-big-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 140px;
-    height: 140px;
-    background-color: var(--text-dark);
-    color: var(--bg-light);
+    height: 100%;
+    object-fit: cover;
     border-radius: 50%;
-    font-size: 5rem;
-    text-decoration: none;
-    margin: 0 auto;
-    transition: transform 0.3s, background-color 0.3s;
+    filter: none; /* Przywrócenie kolorów zdjęcia */
 }
 
-.spotify-big-btn:hover {
-    transform: scale(1.05);
-    background-color: #1DB954; /* Pojawia się zieleń po najechaniu! */
-}
-
-.arrow-hint {
-    position: absolute;
-    top: 20px;
-    right: -120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    opacity: 0.7;
-}
-.arrow-hint i { font-size: 2rem; margin-bottom: 5px; }
-
-.spotify-desc {
-    font-size: 0.9rem;
-    font-weight: 700;
-    line-height: 1.5;
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-/* SEKCJA 3: AKCJE */
-.torn-paper-title {
-    background-color: #e0e0e0; /* Imitacja szarego papieru z tiktoka */
-    padding: 15px 30px;
-    display: inline-block;
+/* --- SEKCJE AKCJI --- */
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--accent-pink);
     margin-bottom: 20px;
-    clip-path: polygon(2% 0, 98% 5%, 100% 95%, 0 100%); /* Nierówne brzegi */
 }
-.torn-paper-title h3 {
-    font-size: 1.5rem;
-    font-weight: 900;
+.details-title { margin-top: 40px; }
+
+.dj-section {
+    background: #fff;
+    padding: 30px 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(201, 92, 117, 0.1);
+    margin-bottom: 30px;
 }
 
-.no-pink-alert {
-    margin-bottom: 40px;
-    font-size: 1rem;
+.spotify-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #1DB954;
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
-.no-pink-alert strong { text-decoration: line-through; }
+.spotify-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(29, 185, 84, 0.3);
+}
 
 .action-grid {
     display: flex;
@@ -365,7 +244,7 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     width: 30%;
 }
 
@@ -373,40 +252,21 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80px;
-    height: 80px;
-    background-color: var(--text-dark);
-    color: var(--bg-light);
+    width: 70px;
+    height: 70px;
+    background-color: #fff;
+    color: var(--accent-pink);
     border-radius: 50%;
-    font-size: 2rem;
+    font-size: 1.8rem;
     text-decoration: none;
+    box-shadow: 0 5px 15px rgba(201, 92, 117, 0.15);
     transition: transform 0.3s;
 }
-
-.round-btn:hover {
-    transform: scale(1.1);
-}
+.round-btn:hover { transform: scale(1.1); background-color: var(--accent-pink); color: #fff; }
 
 .action-label {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     text-align: center;
-}
-
-@media (max-width: 450px) {
-    .main-title { font-size: 4rem; }
-    .arrow-hint { display: none; } /* Ukrywamy strzałkę na bardzo wąskich ekranach */
-    .action-grid { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; }
-    .action-item { width: 40%; }
-}
-
-/* --- FILM GRAIN (SZUM W TLE) --- */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 99999; /* Musi być nad wszystkim */
-    pointer-events: none; /* Żeby nie blokowało klikania! */
-    opacity: 0.04; /* Bardzo delikatna przezroczystość */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    color: var(--text-dark);
 }
