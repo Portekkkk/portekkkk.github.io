@@ -1,16 +1,10 @@
-/* --- ZMIENNE GLOBALNE --- */
+/* --- ZMIENNE --- */
 :root {
-    --bg-gradient: linear-gradient(135deg, #fdf2f5 0%, #fce4e9 100%);
-    --envelope-body: #f8cdd6;
-    --envelope-flap: #f1aebd;
-    --envelope-inside: #e29ba9;
-    --text-dark: #4a2c35;
-    --accent-pink: #c95c75;
-    --accent-hover: #b04961;
-    --spotify-green: #1DB954;
-    --spotify-hover: #1aa34a;
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.8);
+    --bg-dark: #000000;
+    --bg-light: #f8f8f8;
+    --text-dark: #111111;
+    --text-light: #ffffff;
+    --envelope-color: #222222;
 }
 
 * {
@@ -21,360 +15,341 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background: var(--bg-gradient);
+    background-color: var(--bg-dark);
     color: var(--text-dark);
-    min-height: 100vh;
     overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
+    /* Domyślnie blokujemy scrollowanie póki koperta jest widoczna */
+}
+
+body.locked-scroll {
+    overflow: hidden;
+    height: 100vh;
 }
 
 /* =========================================
-   SEKCJA 1: EKRAN POWITALNY (KOPERTA)
+   EKRAN 1: KOPERTA (DARK MODE)
 ========================================= */
 #intro-screen {
     position: fixed;
     inset: 0;
-    background: var(--bg-gradient);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    transition: opacity 1s ease, visibility 1s ease;
 }
 
-.tap-text {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.3rem;
-    color: var(--accent-pink);
-    margin-bottom: 40px;
-    animation: float 2s ease-in-out infinite;
+.intro-title {
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+    margin-bottom: 50px;
+    font-weight: 700;
+    text-align: center;
 }
 
+.intro-hint {
+    margin-top: 50px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    opacity: 0.7;
+}
+
+.intro-deco {
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+.intro-deco.top-right { top: -20px; right: -30px; }
+.intro-deco.bottom-left { bottom: -20px; left: -30px; }
+
+/* KOPERTA */
 .envelope-wrapper {
     position: relative;
-    width: 320px;
-    height: 220px;
+    width: 300px;
+    height: 200px;
     cursor: pointer;
-    perspective: 1200px; /* Perspektywa dla efektu 3D klapki */
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.envelope-wrapper:hover {
-    transform: scale(1.05) translateY(-5px);
+    perspective: 1200px;
 }
 
 .envelope {
     position: absolute;
     inset: 0;
-    background: var(--envelope-inside);
-    border-radius: 8px;
-    box-shadow: 0 20px 40px rgba(201, 92, 117, 0.2);
+    background: #1a1a1a;
+    border-radius: 4px;
 }
 
-/* Dolna część koperty (zachodzące trójkąty) */
 .envelope-front {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 0;
     height: 0;
-    border-left: 160px solid #fce4e9;
-    border-right: 160px solid #fce4e9;
-    border-bottom: 110px solid #f4b8c5;
+    border-left: 150px solid #2a2a2a;
+    border-right: 150px solid #2a2a2a;
+    border-bottom: 100px solid #333333;
     z-index: 3;
-    border-radius: 0 0 8px 8px;
 }
 
-/* Klapka otwierana */
 .envelope-flap {
     position: absolute;
     top: 0;
     left: 0;
     width: 0;
     height: 0;
-    border-left: 160px solid transparent;
-    border-right: 160px solid transparent;
-    border-top: 120px solid var(--envelope-flap);
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 110px solid #222222;
     z-index: 4;
     transform-origin: top;
     transition: transform 0.6s ease-in-out, z-index 0s 0.3s;
 }
 
-.letter {
-    position: absolute;
-    inset: 15px;
-    background: #fff;
-    border-radius: 5px;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-
-.letter-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--accent-pink);
-}
-
-/* Pieczęć zamiast gwiazdki (wygląda premium) */
 .wax-seal {
     position: absolute;
-    top: 95px;
+    top: 90px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-    background: var(--accent-pink);
+    background: #444;
     color: #fff;
-    padding: 12px 18px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    font-weight: bold;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2), 0 5px 15px rgba(201, 92, 117, 0.3);
-    transition: opacity 0.3s ease;
-}
-
-/* --- ANIMACJE JS KOPERTY --- */
-.envelope-wrapper.is-open .envelope-flap {
-    transform: rotateX(180deg);
-    z-index: 1;
-}
-
-.envelope-wrapper.is-open .wax-seal {
-    opacity: 0;
-}
-
-.envelope-wrapper.is-open .letter {
-    transform: translateY(-130px);
-    z-index: 5;
-}
-
-/* =========================================
-   SEKCJA 2: GŁÓWNE ZAPROSZENIE (GLASSMORPHISM)
-========================================= */
-#main-content {
-    flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 40px 20px;
-    opacity: 1;
-    transition: opacity 1s ease, transform 1s ease;
+    font-size: 0.6rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: opacity 0.3s ease;
+}
+.wax-seal i { font-size: 1rem; margin-bottom: 2px; }
+
+/* Animacja otwierania */
+.envelope-wrapper.is-open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
+.envelope-wrapper.is-open .wax-seal { opacity: 0; }
+
+/* =========================================
+   EKRAN 2: ZAPROSZENIE (SCROLL, LIGHT MODE)
+========================================= */
+#main-content {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    padding-bottom: 50px;
+    overflow: hidden;
 }
 
-/* Klasa ukrywająca (używana przez JS) */
 #main-content.hidden {
     display: none;
     opacity: 0;
-    transform: translateY(30px); /* Efekt wjazdu od dołu */
 }
 
-/* Matowe szkło */
-.glass-container {
-    position: relative;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 50px 30px;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 25px 50px rgba(201, 92, 117, 0.15);
-}
-
-.deco-emoji {
+/* Ozdobniki rozrzucone po ekranie */
+.floating-deco {
     position: absolute;
-    font-size: 2.5rem;
-    opacity: 0.9;
-    user-select: none;
+    font-size: 4rem;
+    filter: grayscale(100%);
+    z-index: 0;
+    opacity: 0.8;
 }
-.deco-top { top: -20px; left: 20px; }
-.deco-bottom { bottom: -20px; right: 20px; }
+.deco-1 { top: 20px; left: 10px; }
+.deco-2 { top: 120px; right: 20px; font-size: 3rem; }
+.deco-3 { bottom: 50px; right: 10px; font-size: 2.5rem; }
+.deco-4 { top: -20px; left: -10px; }
+.deco-5 { top: -30px; right: 10px; font-size: 3rem; }
 
+/* Wspólne ustawienia sekcji */
+section {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+/* SEKCJA 1 */
 .subtitle {
-    font-size: 0.9rem;
-    letter-spacing: 4px;
-    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
     margin-bottom: 10px;
-    color: #7a5a63;
+    position: relative;
+    z-index: 1;
 }
 
-.title {
+.main-title {
     font-family: 'Playfair Display', serif;
-    font-size: 4.5rem;
-    color: var(--accent-pink);
-    margin-bottom: 20px;
+    font-size: 5.5rem;
+    font-weight: 400;
     line-height: 1;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
 }
 
-.event-date {
+.date-row {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-top: 2px solid var(--accent-pink);
-    border-bottom: 2px solid var(--accent-pink);
-    padding: 12px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
     margin-bottom: 15px;
-    letter-spacing: 2px;
 }
+.date-row .number { font-size: 2rem; }
+.date-row .separator { font-weight: 300; opacity: 0.5; }
 
-.highlight-date {
-    font-size: 2.2rem;
-    color: var(--accent-pink);
-    font-family: 'Playfair Display', serif;
-}
-
-.separator {
-    color: rgba(201, 92, 117, 0.4);
-    font-weight: 300;
-}
-
-.event-time {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    color: var(--accent-pink);
-    margin-bottom: 35px;
+.time {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 30px;
 }
 
 .photo-wrapper {
-    width: 220px;
-    height: 220px;
-    margin: 0 auto 35px auto;
-    border-radius: 50%;
-    padding: 8px;
-    background: linear-gradient(135deg, #fff, var(--envelope-body));
-    box-shadow: 0 15px 35px rgba(201, 92, 117, 0.2);
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    z-index: 1;
 }
-
 .photo-wrapper img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+    height: auto;
+    /* Efekt czarno-biały dla dopasowania do stylu */
+    filter: grayscale(100%) contrast(110%); 
 }
 
-/* Ostrzeżenie Dress Code */
-.dress-code-alert {
-    background: #fff;
-    border-left: 6px solid var(--accent-pink);
-    border-radius: 12px;
-    padding: 15px 20px;
-    margin-bottom: 35px;
+/* PRZERYWANA LINIA */
+.dashed-divider {
+    border: none;
+    border-top: 3px dashed var(--text-dark);
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
+    opacity: 0.3;
+}
+
+/* SEKCJA 2: SPOTIFY */
+.section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 40px;
+}
+
+.spotify-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.spotify-big-btn {
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 15px;
-    text-align: left;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    width: 140px;
+    height: 140px;
+    background-color: var(--text-dark);
+    color: var(--bg-light);
+    border-radius: 50%;
+    font-size: 5rem;
+    text-decoration: none;
+    margin: 0 auto;
+    transition: transform 0.3s, background-color 0.3s;
 }
 
-.alert-icon {
-    font-size: 1.8rem;
-    color: var(--accent-pink);
+.spotify-big-btn:hover {
+    transform: scale(1.05);
+    background-color: #1DB954; /* Pojawia się zieleń po najechaniu! */
 }
 
-.alert-text p {
-    font-size: 0.95rem;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-.strike-through {
-    color: #d81b60;
-    text-decoration: line-through;
-    font-size: 1.1rem;
-}
-
-/* Przyciski (Linki) */
-.action-buttons {
+.arrow-hint {
+    position: absolute;
+    top: 20px;
+    right: -120px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.btn {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border-radius: 50px;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
+.arrow-hint i { font-size: 2rem; margin-bottom: 5px; }
+
+.spotify-desc {
     font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-weight: 700;
+    line-height: 1.5;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* SEKCJA 3: AKCJE */
+.torn-paper-title {
+    background-color: #e0e0e0; /* Imitacja szarego papieru z tiktoka */
+    padding: 15px 30px;
+    display: inline-block;
+    margin-bottom: 20px;
+    clip-path: polygon(2% 0, 98% 5%, 100% 95%, 0 100%); /* Nierówne brzegi */
+}
+.torn-paper-title h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.no-pink-alert {
+    margin-bottom: 40px;
+    font-size: 1rem;
+}
+.no-pink-alert strong { text-decoration: line-through; }
+
+.action-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 30%;
+}
+
+.round-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    background-color: var(--text-dark);
+    color: var(--bg-light);
+    border-radius: 50%;
+    font-size: 2rem;
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
+    transition: transform 0.3s;
 }
 
-.btn i { font-size: 1.3rem; }
-
-.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+.round-btn:hover {
+    transform: scale(1.1);
 }
 
-.btn-primary {
-    background: var(--accent-pink);
-    color: #fff;
-}
-.btn-primary:hover {
-    background: var(--accent-hover);
-    box-shadow: 0 10px 20px rgba(201, 92, 117, 0.3);
+.action-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
 }
 
-.btn-secondary {
-    background: transparent;
-    color: var(--accent-pink);
-    border-color: var(--accent-pink);
-}
-.btn-secondary:hover {
-    background: rgba(201, 92, 117, 0.08);
-}
-
-.btn-spotify {
-    background: var(--spotify-green);
-    color: #fff;
-}
-.btn-spotify:hover {
-    background: var(--spotify-hover);
-    box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3);
-}
-
-/* Keyframes */
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Responsywność dla małych ekranów (mobile first adjustment) */
-@media (max-width: 480px) {
-    .glass-container {
-        padding: 40px 20px;
-        border-radius: 20px;
-    }
-    .title { font-size: 3.5rem; }
-    .envelope-wrapper { width: 280px; height: 190px; }
-    .envelope-front {
-        border-left-width: 140px;
-        border-right-width: 140px;
-        border-bottom-width: 95px;
-    }
-    .envelope-flap {
-        border-left-width: 140px;
-        border-right-width: 140px;
-        border-top-width: 105px;
-    }
-    .btn { font-size: 0.8rem; }
+@media (max-width: 450px) {
+    .main-title { font-size: 4rem; }
+    .arrow-hint { display: none; } /* Ukrywamy strzałkę na bardzo wąskich ekranach */
+    .action-grid { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    .action-item { width: 40%; }
 }
