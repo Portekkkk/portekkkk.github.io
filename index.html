@@ -7,8 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400;600&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Biblioteka AOS do animacji przy scrollowaniu -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
@@ -34,67 +32,69 @@
     <!-- GŁÓWNA STRONA -->
     <main id="main-content" class="hidden">
         
-        <!-- Płótno wymuszające scrollowanie (taller than screen) -->
-        <div class="canvas-wrapper">
+        <!-- SEKCJA 1: HERO -->
+        <section class="hero-section" data-aos="fade-up" data-aos-duration="1200">
+            <p class="subtitle">IT'S MY BIRTHDAY</p>
+            <h1 class="main-title">AS<span class="heart-dot">I</span>A</h1>
             
-            <!-- TYTUŁ I DATA (Pojawia się od razu) -->
-            <div class="header-block">
-                <div data-aos="fade-down" data-aos-duration="1200">
-                    <p class="subtitle">IT'S MY BIRTHDAY</p>
-                    <h1 class="main-title">AS<span class="heart-dot">I</span>A</h1>
-                    <div class="date-row">
-                        <span class="day">PIĄTEK</span>
-                        <span class="separator">|</span>
-                        <span class="number">07</span>
-                        <span class="separator">|</span>
-                        <span class="month">SIERPNIA</span>
-                    </div>
-                    <div class="time">17:00</div>
+            <div class="separator-bow">🎀</div>
+            
+            <div class="date-row">
+                <span class="day">PIĄTEK</span>
+                <span class="separator">|</span>
+                <span class="number">07</span>
+                <span class="separator">|</span>
+                <span class="month">SIERPNIA</span>
+            </div>
+            
+            <div class="separator-leaves">🌿 🩷 🌿</div>
+            
+            <div class="time">17:00</div>
+            
+            <div class="photo-wrapper" data-aos="zoom-in" data-aos-delay="300" data-aos-duration="1000">
+                <img src="foto_asia.png" alt="Asia" onerror="this.src='https://via.placeholder.com/250x350/transparent/cf738a?text=Foto+Asi';">
+            </div>
+        </section>
+
+        <!-- SEKCJA 2: SELF DJ -->
+        <section class="dj-section" data-aos="fade-up" data-aos-duration="1000">
+            <h2 class="handwritten-title">SELF DJ!</h2>
+            <div class="dj-container">
+                <!-- TUTAJ WPISZ LINK DO DOKUMENTU GOOGLE -->
+                <a href="LINK_DO_GOOGLE_DOCS" target="_blank" class="spotify-circle-btn">
+                    <i class="fa-brands fa-spotify"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- SEKCJA 3: DETAILS -->
+        <section class="details-section" data-aos="fade-up" data-aos-duration="1000">
+            <div class="separator-bow-small">🎀</div>
+            <h2 class="handwritten-title">DETAILS</h2>
+            
+            <div class="action-grid">
+                <div class="action-item">
+                    <a href="#" class="round-icon-btn"><i class="fa-solid fa-location-dot"></i></a>
+                    <span class="action-label">MIEJSCE</span>
+                </div>
+                
+                <div class="action-item">
+                    <!-- Zmieniona ikona na sukienkę -->
+                    <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-person-dress"></i></a>
+                    <span class="action-label">DRESS CODE</span>
+                </div>
+                
+                <div class="action-item">
+                    <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-check"></i></a>
+                    <span class="action-label">POTWIERDZENIE</span>
                 </div>
             </div>
-
-            <!-- SELF DJ (Czeka na scroll - efekt zoom-in) -->
-            <div class="dj-block">
-                <div data-aos="zoom-in" data-aos-duration="1000">
-                    <h2 class="handwritten-title">SELF DJ!</h2>
-                    <a href="LINK_DO_GOOGLE_DOCS_SPOTIFY" target="_blank" class="spotify-circle-btn">
-                        <i class="fa-brands fa-spotify"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- AKCJE (Czekają na scroll - wjeżdżają z dołu) -->
-            <div class="details-block">
-                <div data-aos="fade-up" data-aos-duration="1000">
-                    <h2 class="handwritten-title">DETAILS</h2>
-                    <div class="action-grid">
-                        <div class="action-item">
-                            <a href="#" class="round-icon-btn"><i class="fa-solid fa-location-dot"></i></a>
-                            <span class="action-label">MIEJSCE</span>
-                        </div>
-                        <div class="action-item">
-                            <a href="https://docs.google.com/document/d/129iYUb1bweLgP6Iaj9j1QYu65DNLYeSfdtChwxtYmek/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-shirt"></i></a>
-                            <span class="action-label">DRESS CODE</span>
-                        </div>
-                        <div class="action-item">
-                            <a href="https://docs.google.com/document/d/10vUbNsFQQJTBgeLEWMgqDjnUA7bAlVqDUyJ8d94P77s/edit?usp=drivesdk" target="_blank" class="round-icon-btn"><i class="fa-solid fa-check"></i></a>
-                            <span class="action-label">POTWIERDZENIE</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ZDJĘCIE JUBILATKI (Czeka na scroll - wjeżdża z prawej) -->
-            <div class="photo-block">
-                <div data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
-                    <img src="foto_asia.png" alt="Asia">
-                </div>
-            </div>
-
-        </div>
+            
+            <div class="footer-deco">🌸 🪩 🌸</div>
+        </section>
+        
     </main>
 
-    <!-- Skrypty -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
