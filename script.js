@@ -1,53 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Pobieranie referencji do elementów DOM
     const envelopeWrapper = document.getElementById('envelope');
     const introScreen = document.getElementById('intro-screen');
     const mainContent = document.getElementById('main-content');
     
-    // Zabezpieczenie (zapobiega wielokrotnemu kliknięciu podczas animacji)
     let isOpened = false;
 
     envelopeWrapper.addEventListener('click', () => {
         if (isOpened) return;
         isOpened = true;
 
-        // 1. Dodajemy klasę, która w CSS uruchamia otwieranie koperty i wysuwanie listu
+        // 1. Otwieramy kopertę
         envelopeWrapper.classList.add('is-open');
 
-        // 2. Wystrzał konfetti! Używamy setTimeout, aby zsynchronizować to z wysunięciem listu
-        if (typeof confetti === 'function') {
-            setTimeout(() => {
-                confetti({
-                    particleCount: 120,
-                    spread: 80,
-                    origin: { y: 0.6 },
-                    colors: ['#c95c75', '#f1aebd', '#ffffff', '#fce4e9'] // Kolory zgrane z paletą
-                });
-            }, 400); // 400ms - list jest w połowie drogi
-        }
-
-        // 3. Zarządzanie przejściem ekranów (Fade-out intro, Fade-in main)
+        // 2. Po krótkiej chwili ukrywamy czarny ekran
         setTimeout(() => {
-            // A. Płynne wyciemnienie intra
             introScreen.style.opacity = '0';
-            introScreen.style.visibility = 'hidden'; 
             
             setTimeout(() => {
-                // B. Całkowite ukrycie intra z drzewa DOM (optymalizacja)
+                // Usuwamy z drzewa DOM
                 introScreen.style.display = 'none';
                 
-                // C. Pokazanie struktury głównego contentu
+                // Pokazujemy główny kontent i ustawiamy tło na jasne
                 mainContent.classList.remove('hidden');
+                document.body.style.backgroundColor = '#f8f8f8'; // Zmiana bg dla reszty okna
                 
-                // D. Hack wymuszający "reflow" przeglądarki, żeby animacja z opacity zadziałała
-                void mainContent.offsetWidth; 
+                // ODBLOKOWANIE SCROLLA!
+                document.body.classList.remove('locked-scroll');
                 
-                // E. Animacja wjazdu zaproszenia
+                // Płynne pokazanie
                 mainContent.style.opacity = '1';
-                mainContent.style.transform = 'translateY(0)';
                 
-            }, 800); // Czas trwania animacji CSS opacity dla intro-screen
-
-        }, 1800); // Tyle czasu użytkownik podziwia otwarty list i konfetti przed zmianą ekranu
+                // INICJALIZACJA AOS (Animacje przy scrollu)
+                // Uruchamiamy to dopiero tutaj, żeby skrypt policzył wysokości po odkryciu sekcji
+                AOS.init({
+                    once: false, // animacje odpalą się za każdym razem gdy scrollujesz góra-dół
+                    offset: 50,  // wjeżdża nieco szybciej
+                });
+                
+            }, 1000);
+        }, 1000);
     });
 });
