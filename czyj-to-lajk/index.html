@@ -177,6 +177,12 @@ button.suspect:active{transform:scale(.97)}
 .suspect .tick svg{width:14px;height:14px}
 div.suspect{cursor:default}
 .votestatus{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.waitbox{display:grid;gap:12px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.waitlist{display:grid;gap:6px}
+.wl{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 4px 4px 8px;border-radius:12px;background:var(--surface-2)}
+.wl .btn-quiet{min-height:36px;font-size:14px}
+.wl-st{flex:none;padding:5px 8px;border-radius:7px;background:var(--surface);color:var(--muted);font:800 11px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase}
+.wl-st.off{background:var(--bad-soft);color:var(--bad)}
 .voters{display:flex;flex-wrap:wrap;gap:6px}
 .voter{position:relative;opacity:.38;transition:opacity .2s}
 .voter.done{opacity:1}
@@ -950,6 +956,8 @@ function sanitizeG(g) {
     id: String(g.id || ''), t0: Number(g.t0) || 0, gid: String(g.gid || ''),
     ph: ['lobby', 'play', 'reveal', 'end'].includes(g.ph) ? g.ph : 'lobby',
     n: clampInt(g.n, 0, 99), i: clampInt(g.i, 0, 99), tv: !!g.tv,
+    out: Array.isArray(g.out) ? g.out.filter(x => typeof x === 'string').slice(0, MAX_PLAYERS) : [],
+    vd: Array.isArray(g.vd) ? g.vd.filter(x => typeof x === 'string').slice(0, MAX_PLAYERS) : [],
     r: typeof g.r === 'string' ? g.r : null,
     l: typeof g.l === 'string' && COMPACT_RE.test(g.l) ? g.l : null,
     pl: Array.isArray(g.pl) ? g.pl.filter(x => Array.isArray(x) && typeof x[0] === 'string').slice(0, MAX_PLAYERS).map(x => [x[0], cleanName(x[1]) || 'Gracz', clampInt(x[2], 0, COLORS.length - 1)]) : [],
@@ -1027,7 +1035,12 @@ function hostOnPeers() {
       changed = true;
     }
   }
-  if (G.ph === 'play') checkAllVoted();
+  if (G.out && G.out.length) {
+    // someone we stopped waiting for is back online: wait for them again
+    const present = new Set(lobbyPlayers().map(p => p.key));
+    if (G.out.some(k => present.has(k))) { G.out = G.out.filter(k => !present.has(k)); changed = true; }
+  }
+  if (G.ph === 'play' && trackVotes()) changed = true;
   if (changed) commitHost();
 }
 function collectVotes() {
@@ -1048,15 +1061,33 @@ function voteCache() {
   Object.assign(H.vc.m, collectVotes());
   return H.vc.m;
 }
-function checkAllVoted() {
+// The round waits for an answer from every player in the game, offline ones included,
+// unless the host chose not to wait for someone who is offline.
+function allVoted() {
   const G = S.host.g;
-  if (G.ph !== 'play') { clearTimeout(revealT); revealT = 0; return; }
+  if (G.ph !== 'play') return false;
   const votes = voteCache();
-  const present = new Set(lobbyPlayers().map(p => p.key));
-  const need = G.pl.filter(x => present.has(x[0]));
-  const all = need.length >= 2 && need.every(x => votes[x[0]]);
-  if (all && !revealT) revealT = setTimeout(() => { revealT = 0; doReveal(); }, 1100);
+  const out = new Set(G.out || []);
+  const need = G.pl.filter(x => !out.has(x[0]));
+  return need.length >= 1 && need.every(x => votes[x[0]]);
+}
+function trackVotes() {
+  const G = S.host.g;
+  if (G.ph !== 'play') { clearTimeout(revealT); revealT = 0; return false; }
+  const vd = Object.keys(voteCache()).sort();
+  const changed = vd.join(',') !== (G.vd || []).join(',');
+  if (changed) G.vd = vd;
+  const all = allVoted();
+  if (all && !revealT) revealT = setTimeout(() => { revealT = 0; if (allVoted()) doReveal(); }, 1100);
   else if (!all && revealT) { clearTimeout(revealT); revealT = 0; }
+  return changed;
+}
+function hostSkipPlayer(key) {
+  const G = S.host.g;
+  if (G.ph !== 'play') return;
+  G.out = (G.out || []).filter(k => k !== key).concat([key]);
+  trackVotes();
+  commitHost();
 }
 function markUsed(id) { const u = S.host.used; if (!u.includes(id)) u.push(id); if (u.length > 400) u.splice(0, u.length - 400); }
 function doReveal() {
@@ -1081,7 +1112,7 @@ function beginRound() {
   if (!item) { finishGame(); return; }
   G.l = item.c;
   G.r = G.gid + '.' + G.i + '.' + H.skips;
-  G.rv = null; G.ph = 'play'; H.vc = null;
+  G.rv = null; G.ph = 'play'; G.vd = []; H.vc = null;
   commitHost();
 }
 function finishGame() {
@@ -1120,14 +1151,14 @@ function hostStart() {
   const names = uniqueNames(players);
   G.pl = players.map((p, i) => [p.key, names[i], i % COLORS.length]);
   G.sc = {}; for (const p of players) G.sc[p.key] = 0;
-  G.gid = rid(4); G.n = n; G.i = 1; G.aw = null; G.tv = !!H.tv;
+  G.gid = rid(4); G.n = n; G.i = 1; G.aw = null; G.tv = !!H.tv; G.out = []; G.vd = [];
   set(s => { s.myVote = null; });
   beginRound();
 }
 function hostToLobby() {
   const G = S.host.g;
   clearTimeout(revealT); revealT = 0;
-  G.ph = 'lobby'; G.pl = null; G.sc = null; G.rv = null; G.aw = null; G.l = null; G.r = null; G.i = 0; G.n = S.host.rounds;
+  G.ph = 'lobby'; G.pl = null; G.sc = null; G.rv = null; G.aw = null; G.l = null; G.r = null; G.i = 0; G.n = S.host.rounds; G.out = []; G.vd = [];
   commitHost();
 }
 
@@ -1181,7 +1212,7 @@ async function leaveGame() {
 function castVote(G, k) {
   if (G.ph !== 'play') return;
   set(s => { s.myVote = { r: G.r, k }; });
-  if (S.isHost && S.host) checkAllVoted();
+  if (S.isHost && S.host && trackVotes()) commitHost();
 }
 function copyText(text, okMsg) {
   try {
@@ -1552,7 +1583,7 @@ function Home() {
         <li>Załóż grę i pokaż znajomym kod QR albo wyślij im link.</li>
         <li>Każdy wkleja linki do kilku TikToków, które polubił.</li>
         <li>Gra puszcza losowego TikToka, a każdy na swoim telefonie typuje, kto go polubił.</li>
-        <li>Za trafienie +${GUESS} pkt. Za każdą osobę zmyloną Twoim lajkiem +${FOOL} pkt.</li>
+        <li>Gdy odpowiedzą wszyscy, gra pokazuje, czyj to lajk, i dolicza punkty: +${GUESS} za trafienie, +${FOOL} za każdą osobę zmyloną Twoim lajkiem.</li>
       </ol>
     </div>
   </section>`;
@@ -1647,19 +1678,36 @@ function Lobby({ G }) {
     </div>
   </section>`;
 }
-function VoteStatus({ pl, voted, present }) {
-  const list = pl.filter(x => present.has(x[0]));
-  const done = list.filter(x => voted.has(x[0])).length;
-  return html`<div class="votestatus">
-    <div class="voters">${list.map(x => html`<span class=${'voter' + (voted.has(x[0]) ? ' done' : '')} key=${x[0]} title=${x[1]}><${Avatar} name=${x[1]} col=${x[2]} size=${30} /></span>`)}</div>
-    <span class="small muted">Typy: ${done} z ${list.length}</span>
+function WaitList({ G, voted, present }) {
+  const out = new Set(G.out || []);
+  const active = G.pl.filter(x => !out.has(x[0]));
+  const waiting = active.filter(x => !voted.has(x[0]));
+  const done = active.length - waiting.length;
+  const skipped = G.pl.filter(x => out.has(x[0]));
+  return html`<div class="waitbox" role="status">
+    <div class="votestatus">
+      <div class="voters">${active.map(x => html`<span class=${'voter' + (voted.has(x[0]) ? ' done' : '')} key=${x[0]} title=${x[1]}><${Avatar} name=${x[1]} col=${x[2]} size=${30} /></span>`)}</div>
+      <span class="small muted">Odpowiedzi: ${done} z ${active.length}</span>
+    </div>
+    ${waiting.length ? html`<div class="waitlist">
+      <span class="label">Czekamy na wszystkich. Brakuje:</span>
+      ${waiting.map(x => {
+        const off = !present.has(x[0]);
+        return html`<div class="wl" key=${x[0]}>
+          <${Avatar} name=${x[1]} col=${x[2]} size=${28} />
+          <span class="nm grow">${x[1]}${x[0] === S.me.key ? ' (Ty)' : ''}</span>
+          <span class=${'wl-st' + (off ? ' off' : '')}>${off ? 'offline' : 'wybiera…'}</span>
+          ${S.isHost && off ? html`<button class="btn btn-quiet" type="button" onClick=${() => hostSkipPlayer(x[0])}>Nie czekaj</button>` : null}
+        </div>`;
+      })}
+    </div>` : html`<p class="waiting">Wszyscy odpowiedzieli. Odkrywam…</p>`}
+    ${skipped.length ? html`<p class="small muted">Bez czekania na: ${joinNames(skipped.map(x => x[1]))}. Gdy ${skipped.length > 1 ? 'wrócą' : 'wróci'}, gra znów poczeka.</p>` : null}
   </div>`;
 }
 function HostRoundControls() {
   const [ask, setAsk] = useState(false);
-  return html`<div class="dock">
-    <button class="btn btn-secondary" type="button" onClick=${doReveal}>Odkryj teraz</button>
-    ${ask ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setAsk(false)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { setAsk(false); hostSkip(); }}>Tak, pomiń</button></div>`
+  return html`<div class="section center">
+    ${ask ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setAsk(false)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { setAsk(false); hostSkip(); }}>Tak, pomiń ten film</button></div>`
       : html`<button class="btn btn-quiet" type="button" onClick=${() => setAsk(true)}>Film nie działa? Pomiń</button>`}
   </div>`;
 }
@@ -1671,7 +1719,8 @@ function Round({ G }) {
   const mine = S.myVote && S.myVote.r === G.r ? S.myVote.k : null;
   const players = lobbyPlayers();
   const present = new Set(players.map(p => p.key));
-  const voted = new Set(players.filter(p => p.vote && p.vote.r === G.r).map(p => p.key));
+  const voted = new Set(G.vd || []);
+  for (const p of players) if (p.vote && p.vote.r === G.r) voted.add(p.key);
   if (S.isHost && S.host.vc && S.host.vc.r === G.r) for (const k in S.host.vc.m) voted.add(k);
   const showVideo = !G.tv || S.isHost;
   return html`<section class="stack">
@@ -1684,9 +1733,9 @@ function Round({ G }) {
             <${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span>${mine === x[0] ? html`<span class="tick">${Icon.check()}</span>` : null}
           </button>`)}</div>`
         : html`<p class="muted">Brakuje innych graczy.</p>`}
-      <p class="small muted">${mine ? 'Typ zapisany. Możesz go zmienić do odkrycia.' : 'Jeśli to Twój lajk, wskaż kogoś innego, żeby zmylić resztę.'}</p>
+      <p class="small muted">${mine ? 'Typ zapisany. Możesz go zmienić, dopóki wszyscy nie odpowiedzą.' : 'Jeśli to Twój lajk, wskaż kogoś innego, żeby zmylić resztę.'}</p>
     </div>
-    <${VoteStatus} pl=${G.pl} voted=${voted} present=${present} />
+    <${WaitList} G=${G} voted=${voted} present=${present} />
     ${S.isHost ? html`<${HostRoundControls} />` : null}
   </section>`;
 }
