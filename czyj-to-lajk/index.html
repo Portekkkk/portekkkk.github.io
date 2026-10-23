@@ -1,0 +1,1855 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Czyj to lajk?</title>
+<meta name="description" content="Imprezowa gra na telefony: zgadnij, kto z Was polubił tego TikToka.">
+<meta property="og:title" content="Czyj to lajk?">
+<meta property="og:description" content="Wrzucacie swoje polubione TikToki, a reszta zgaduje, kto co polubił.">
+<meta name="theme-color" content="#EDEFFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0D25" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23DD1258' d='M12 21c-.3 0-.6-.1-.8-.3C7.4 17.6 2.5 13.7 2.5 9.1 2.5 6.2 4.7 4 7.5 4c1.8 0 3.4.9 4.5 2.4C13.1 4.9 14.7 4 16.5 4c2.8 0 5 2.2 5 5.1 0 4.6-4.9 8.5-8.7 11.6-.2.2-.5.3-.8.3z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap">
+<style>
+/* Layout: one narrow phone column (max 520px). Sticky top bar carries the game code; the main action docks at thumb height. */
+:root{
+  --bg:#EDEFFA;
+  --surface:#FFFFFF;
+  --surface-2:#E1E4F4;
+  --ink:#17143D;
+  --muted:#5A5784;
+  --line:#D0D3EA;
+  --like:#D6114F;
+  --like-soft:#FCE2EB;
+  --btn:#DD1258;
+  --on-like:#FFFFFF;
+  --pop:#FFC23A;
+  --ok:#087A4B;
+  --ok-soft:#DCF4E8;
+  --bad:#C2304A;
+  --bad-soft:#FBE3E7;
+  --shadow:0 1px 0 rgba(23,20,61,.05),0 12px 28px -18px rgba(23,20,61,.45);
+  --f-display:"Unbounded","Arial Black","Helvetica Neue",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0F0D25;--surface:#1A1737;--surface-2:#252249;--ink:#F1EFFF;--muted:#A3A0D0;--line:#322E5C;
+    --like:#FF5A8C;--like-soft:#3B1736;--btn:#DD1258;--on-like:#FFFFFF;--pop:#FFD35A;
+    --ok:#3DD8A0;--ok-soft:#113A33;--bad:#FF7189;--bad-soft:#3F1A2B;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 14px 34px -18px rgba(0,0,0,.85);
+    color-scheme:dark;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+[hidden]{display:none!important}
+img{max-width:100%}
+button,input{font:inherit;color:inherit}
+p{margin:0}
+a{color:var(--like)}
+.wrap{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 28px}
+
+/* type */
+h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:800;line-height:1.08;letter-spacing:-.015em;text-wrap:balance}
+.h1{font-size:29px}
+.h2{font-size:21px}
+.h3{font-size:16px;letter-spacing:0}
+.eyebrow{font:800 12px/1.2 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.eyebrow.like{color:var(--like)}
+.muted{color:var(--muted)}
+.small{font-size:14px;line-height:1.4}
+.lead{font-size:18px;line-height:1.4;max-width:32ch}
+
+/* layout */
+.stack{display:grid;gap:16px}
+.stack-lg{display:grid;gap:28px}
+.section{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.grow{flex:1 1 auto;min-width:0}
+.center{text-align:center;justify-items:center}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;background:var(--bg)}
+.brand{display:inline-flex;align-items:center;gap:8px;font:800 14px/1 var(--f-display);letter-spacing:-.01em;white-space:nowrap}
+.brand svg{width:20px;height:20px;color:var(--like)}
+.top-right{display:flex;align-items:center;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;border:0;border-radius:999px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);font:800 13px/1 var(--f-body);letter-spacing:.04em;white-space:nowrap}
+button.chip{cursor:pointer}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.dot.off{background:var(--bad)}
+.confirm{display:grid;gap:12px;margin-bottom:16px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.banner{margin-bottom:14px;padding:10px 14px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 2px var(--pop);font-size:14px;font-weight:700}
+
+/* buttons */
+.btn{appearance:none;-webkit-appearance:none;border:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:0 20px;border-radius:16px;font:800 17px/1.15 var(--f-body);text-align:center;text-decoration:none;cursor:pointer;transition:transform .12s ease,opacity .12s ease;user-select:none;-webkit-user-select:none}
+.btn:active{transform:scale(.98)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--btn);color:var(--on-like);box-shadow:0 12px 24px -14px var(--btn)}
+.btn-secondary{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-secondary.danger{color:var(--bad)}
+.btn-quiet{background:none;color:var(--muted);min-height:44px;width:auto;padding:0 10px;font-size:15px;font-weight:700}
+.btn-quiet.danger{color:var(--bad)}
+.w-auto{width:auto}
+.btn[disabled]{opacity:.42;cursor:not-allowed;box-shadow:none}
+.btn.busy{opacity:.7;pointer-events:none}
+:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
+
+/* inputs */
+.field{display:grid;gap:8px}
+.label{font:800 14px/1.2 var(--f-body)}
+.input{width:100%;min-height:56px;padding:0 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:600 17px/1.2 var(--f-body);-webkit-appearance:none;appearance:none}
+.input::placeholder{color:var(--muted);opacity:.85}
+.input:focus{outline:none;border-color:var(--like);box-shadow:0 0 0 4px var(--like-soft)}
+.code-input{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.3em;text-transform:uppercase;text-align:center;padding:0 0 0 .3em}
+.code-input::placeholder{letter-spacing:.12em}
+.join-row .input{flex:1 1 auto;min-width:0}
+.join-row .btn{flex:none;width:auto;min-width:112px}
+.msg{font-size:14px;font-weight:600;line-height:1.4}
+.msg.ok{color:var(--ok)}
+.msg.err{color:var(--bad)}
+.msg.info{color:var(--muted)}
+
+/* hero */
+.hero{display:grid;gap:18px;padding-block:6px 0}
+.wordmark{margin:0;font:800 clamp(42px,13vw,64px)/.94 var(--f-display);letter-spacing:-.035em}
+.wordmark .q{color:var(--like)}
+
+/* lineup: the police height chart behind the suspects */
+.lineup{position:relative;overflow:hidden;display:grid;justify-items:center;gap:14px;padding:22px 16px 18px 48px;border-radius:22px;background-color:var(--surface-2);background-image:repeating-linear-gradient(to bottom,transparent 0 22px,var(--line) 22px 24px)}
+.lineup .marks{position:absolute;left:12px;top:14px;bottom:14px;display:flex;flex-direction:column;justify-content:space-between;font:800 10px/1 var(--f-body);letter-spacing:.04em;color:var(--muted);font-variant-numeric:tabular-nums}
+.suspects-row{display:flex;align-items:flex-end;justify-content:center;gap:14px;flex-wrap:wrap}
+.hero-lineup{padding-block:40px 22px}
+.mid{position:relative;display:grid}
+.bubble{position:absolute;top:-34px;right:-26px;width:46px;height:42px;display:grid;place-items:center;color:var(--btn);animation:bob 2.6s ease-in-out infinite}
+.bubble svg{position:absolute;inset:0;width:100%;height:100%}
+.bubble b{position:relative;margin-top:-3px;font:800 17px/1 var(--f-display);color:var(--on-like)}
+.placard{display:grid;justify-items:center;gap:6px;min-width:min(260px,100%);max-width:100%;padding:12px 18px 14px;border-radius:12px;background:var(--ink);color:var(--bg);text-align:center}
+.placard .pl-k{font:800 11px/1.2 var(--f-body);letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.placard strong{font:800 24px/1.1 var(--f-display);overflow-wrap:anywhere}
+
+/* avatar */
+.av{width:var(--s,40px);height:var(--s,40px);flex:none;display:inline-grid;place-items:center;border-radius:50%;background:var(--c);color:var(--cf);font:800 calc(var(--s,40px) * .42)/1 var(--f-display);box-shadow:0 0 0 2px var(--surface)}
+
+/* tiktok player and fallback tile */
+.player-wrap{display:grid;justify-items:center;gap:8px}
+.player{position:relative;width:min(100%,340px);width:min(100%,calc(56svh * 9 / 16));max-width:100%;aspect-ratio:9/16;overflow:hidden;border-radius:18px;background:#000;box-shadow:var(--shadow)}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.open-tt{font-size:14px;font-weight:700;color:var(--muted)}
+.tvnote{display:flex;align-items:center;gap:12px;padding:16px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.tvnote svg{width:28px;height:28px;flex:none;color:var(--like)}
+.tile{display:flex;align-items:stretch;gap:14px;padding:12px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);color:var(--ink);text-decoration:none;transition:transform .12s ease}
+.tile:active{transform:scale(.99)}
+.thumb{position:relative;flex:none;width:92px;max-width:100%;aspect-ratio:9/16;overflow:hidden;display:grid;place-items:center;border-radius:14px}
+.thumb::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.08) 0 6px,transparent 6px 14px)}
+.play{position:relative;z-index:1;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.94);color:#17143D;box-shadow:0 8px 18px rgba(0,0,0,.28)}
+.play svg{width:20px;height:20px;margin-left:3px}
+.tile-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.handle{font:800 17px/1.2 var(--f-display);letter-spacing:-.01em;overflow-wrap:anywhere}
+.tile-cta{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;background:var(--btn);color:var(--on-like);font:800 15px/1.1 var(--f-body)}
+.tile-cta svg{width:16px;height:16px}
+.tile.small{padding:10px}
+.tile.small .thumb{width:54px;border-radius:10px}
+.tile.small .play{width:30px;height:30px}
+.tile.small .play svg{width:14px;height:14px;margin-left:2px}
+.tile.small .handle{font-size:15px}
+.tile.small .tile-cta{min-height:38px;font-size:14px}
+
+/* suspects grid */
+.suspects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.suspects > :last-child:nth-child(odd){grid-column:1 / -1}
+.suspect{position:relative;display:flex;align-items:center;gap:10px;min-height:66px;padding:10px 12px;border:0;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);font:800 16px/1.2 var(--f-body);text-align:left;cursor:pointer;transition:transform .12s ease}
+button.suspect:active{transform:scale(.97)}
+.suspect .nm{min-width:0}
+.suspect[aria-pressed="true"]{background:var(--like-soft);box-shadow:inset 0 0 0 3px var(--like)}
+.suspect .tick{position:absolute;top:-7px;right:-7px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:var(--btn);color:var(--on-like);box-shadow:0 0 0 3px var(--bg)}
+.suspect .tick svg{width:14px;height:14px}
+div.suspect{cursor:default}
+.votestatus{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.voters{display:flex;flex-wrap:wrap;gap:6px}
+.voter{position:relative;opacity:.38;transition:opacity .2s}
+.voter.done{opacity:1}
+.voter.done::after{content:"";position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--bg)}
+
+/* round */
+.roundhead{display:grid;gap:8px}
+.progress{height:6px;overflow:hidden;border-radius:99px;background:var(--surface-2)}
+.progress i{display:block;height:100%;border-radius:inherit;background:var(--like);transition:width .35s ease}
+
+/* reveal */
+.outcome{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:14px 16px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line)}
+.outcome strong{font:800 18px/1.2 var(--f-display)}
+.outcome span{font-weight:700}
+.outcome.ok{background:var(--ok-soft);box-shadow:none}
+.outcome.ok strong,.outcome.ok span{color:var(--ok)}
+.outcome.no{background:var(--bad-soft);box-shadow:none}
+.outcome.no strong{color:var(--bad)}
+.outcome.own{background:var(--like-soft);box-shadow:none}
+.outcome.own strong{color:var(--like)}
+.results{display:grid;gap:6px}
+.res{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 12px 8px 10px;border-radius:14px;background:var(--surface)}
+.res-txt{min-width:0;overflow-wrap:anywhere;font-size:15px}
+.res-txt b{font-weight:800}
+.arrow{color:var(--muted)}
+.res .pts{font:800 14px/1 var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.res.ok .pts{color:var(--ok)}
+.res.no .pts,.res.none .pts{color:var(--muted)}
+.res.own .pts{color:var(--like)}
+.mark{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 7px;border-radius:999px;font:800 11px/1 var(--f-body);letter-spacing:.04em;vertical-align:1px}
+.mark.ok{background:var(--ok-soft);color:var(--ok)}
+.mark.no{background:var(--bad-soft);color:var(--bad)}
+.mark.own{background:var(--like-soft);color:var(--like)}
+
+/* scoreboard */
+.board{display:grid;gap:4px}
+.brow{display:grid;grid-template-columns:26px auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 12px;border-radius:14px}
+.brow:nth-child(odd){background:var(--surface)}
+.rank{font:800 13px/1 var(--f-display);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.bname{min-width:0;font-weight:800;overflow-wrap:anywhere}
+.brow.me .bname{color:var(--like)}
+.bscore{display:flex;align-items:baseline;gap:8px;font:800 16px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.delta{font:800 13px/1 var(--f-body);color:var(--ok)}
+
+/* lobby */
+.code-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.code{display:flex;gap:8px}
+.code span{width:54px;height:66px;display:grid;place-items:center;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font:800 30px/1 var(--f-display)}
+.share{display:flex;align-items:center;gap:14px;padding:12px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow)}
+.qr{flex:none;width:124px;height:124px;padding:8px;border-radius:12px;background:#FFFFFF;box-shadow:inset 0 0 0 1.5px var(--line)}
+.qr svg{display:block;width:100%;height:100%}
+.share-txt{flex:1;min-width:0;display:grid;gap:10px}
+.share-txt .btn{min-height:48px;font-size:16px}
+.plist{display:grid;gap:8px}
+.prow{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 12px;border-radius:16px;background:var(--surface)}
+.meta{flex:1;min-width:0;display:grid;gap:2px}
+.nm{font-weight:800;overflow-wrap:anywhere}
+.sub{font-size:14px;color:var(--muted)}
+.sub.okc{color:var(--ok);font-weight:700}
+.tag{flex:none;padding:5px 8px;border-radius:8px;background:var(--surface-2);color:var(--muted);font:800 11px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+.pcard{display:grid;overflow:hidden;border-radius:16px;background:var(--surface)}
+.pcard .prow{background:none}
+.pcard-body{display:grid;gap:12px;padding:2px 12px 14px}
+.links{display:grid;gap:6px;max-height:300px;overflow:auto;overscroll-behavior:contain}
+.link{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--surface-2);font-size:14px;font-weight:600}
+.link .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.lstate{flex:none;padding:5px 7px;border-radius:7px;font:800 11px/1 var(--f-body);letter-spacing:.03em;white-space:nowrap}
+.lstate.ok{background:var(--ok-soft);color:var(--ok)}
+.lstate.out,.lstate.wait{background:var(--surface);color:var(--muted)}
+.x{appearance:none;flex:none;width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:10px;background:none;color:var(--muted);cursor:pointer}
+.x svg{width:16px;height:16px}
+.filebox{display:grid;gap:8px}
+details.how{font-size:14px;color:var(--muted)}
+details.how summary{padding-block:6px;font-weight:800;color:var(--ink);cursor:pointer}
+details.how ol{display:grid;gap:6px;margin:6px 0 0;padding-left:20px}
+.seg{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:4px;padding:4px;border-radius:16px;background:var(--surface-2)}
+.seg button{appearance:none;min-height:46px;padding:0 6px;border:0;border-radius:12px;background:none;color:var(--muted);font:800 16px/1.15 var(--f-display);cursor:pointer}
+.seg.words button{font:800 14px/1.15 var(--f-body)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--like);box-shadow:var(--shadow)}
+.note{display:grid;gap:6px;padding:14px 16px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-size:15px}
+.note.warn{box-shadow:inset 0 0 0 2px var(--pop)}
+.note strong{font-weight:800}
+
+/* dock: main action at thumb height */
+.dock{position:sticky;bottom:0;z-index:4;display:grid;gap:8px;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);box-shadow:0 -16px 16px -4px var(--bg)}
+.dock .btn-quiet{justify-self:center}
+.hint{font-size:14px;color:var(--muted);text-align:center}
+.waiting{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 16px;border-radius:16px;background:var(--surface);color:var(--muted);font-weight:700;text-align:center}
+.waiting::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--like);animation:pulse 1.4s ease-in-out infinite}
+
+/* home */
+.steps{display:grid;gap:14px;margin:0;padding:0;list-style:none;counter-reset:st}
+.steps li{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:12px;counter-increment:st}
+.steps li::before{content:counter(st);width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--like);font:800 14px/1 var(--f-display)}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px;font-weight:700}
+.or::before,.or::after{content:"";flex:1;height:1.5px;background:var(--line)}
+
+/* end */
+.podium{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));align-items:end;gap:8px}
+.pod{min-width:0;display:grid;justify-items:center;gap:8px;text-align:center}
+.pod .nm{font-size:15px}
+.pod .sc{font:800 13px/1 var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums}
+.pod .bar{width:100%;display:grid;place-items:start center;padding-top:12px;border-radius:14px 14px 6px 6px;background:var(--c);color:var(--cf);font:800 22px/1 var(--f-display)}
+.pod.r1 .bar{height:118px}
+.pod.r2 .bar{height:84px}
+.pod.r3 .bar{height:62px}
+.awards{display:grid;gap:10px}
+.award{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.award .meta{gap:4px}
+.aw-k{font:800 11px/1.2 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--like)}
+.aw-v{font-weight:800;overflow-wrap:anywhere}
+.aw-ico{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:var(--like-soft);color:var(--like)}
+.aw-ico svg{width:22px;height:22px}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;max-width:calc(100% - 32px);transform:translateX(-50%);padding:12px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font:700 14px/1.3 var(--f-body);text-align:center;box-shadow:var(--shadow)}
+
+/* motion */
+.burst{position:absolute;left:50%;top:38%;width:0;height:0;pointer-events:none}
+.burst i{position:absolute;left:-10px;top:-10px;width:20px;height:20px;color:var(--like);opacity:0;animation:fly 1.2s cubic-bezier(.15,.7,.3,1) forwards}
+.burst i svg{width:100%;height:100%}
+.pop{animation:pop .55s cubic-bezier(.2,1.5,.4,1) both}
+.pop.d1{animation-delay:.1s}
+@keyframes fly{0%{transform:translate(0,0) scale(.2);opacity:0}12%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(var(--sc));opacity:0}}
+@keyframes pop{0%{transform:translateY(14px) scale(.8);opacity:.3}100%{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){
+  .burst{display:none}
+  .pop,.bubble,.waiting::before{animation:none}
+  .btn,.tile,.suspect,.progress i,.voter{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="wrap"><div class="hero" style="padding-top:28px"><h1 class="wordmark">Czyj to<br>lajk<span class="q">?</span></h1><p class="lead" id="boot-msg">Ładuję grę…</p></div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/preact/standalone.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+(function () {
+'use strict';
+
+var root = document.getElementById('app');
+if (!window.htmPreact) {
+  var bm = document.getElementById('boot-msg');
+  if (bm) bm.textContent = 'Nie udało się wczytać gry. Sprawdź internet i odśwież stronę.';
+  return;
+}
+const { html, render, useState, useEffect, useMemo } = window.htmPreact;
+const TEST = window.CZYJ_TEST || null;
+
+/* ---------- constants ---------- */
+const MAX_LINKS = 30, GUESS = 100, FOOL = 50, MAX_PLAYERS = 16;
+const STORE = 'czyjlajk.v2';
+const ROUNDS = [5, 10, 15, 20];
+const COLORS = [
+  ['#FF7A59', '#1A1033'], ['#FFC233', '#1A1033'], ['#3DDC97', '#0E1E2E'], ['#4CC3FF', '#0E1E2E'],
+  ['#7B61FF', '#FFFFFF'], ['#E8459B', '#FFFFFF'], ['#12B5A6', '#0E1E2E'], ['#B5E550', '#1A1033'],
+  ['#FF9EC4', '#1A1033'], ['#3D6BFF', '#FFFFFF'], ['#FF8F1F', '#1A1033'], ['#9B3FD1', '#FFFFFF']
+];
+const CONS = 'BCDFGHJKLMNPRSTWZ', VOW = 'AEIOUY';
+const BAD_CODES = new Set(['DUPA', 'DUPE', 'DUPY', 'CIPA', 'CIPY', 'JEBE', 'JEBA', 'JEBY', 'SUKA', 'SUKI', 'KUTA', 'HUJA', 'HUJE', 'PEDA', 'CYCE', 'CYCA', 'SRAM', 'KUPA', 'KUPY', 'ZIGA']);
+// Phones talk through public MQTT brokers; the game publishes to both so one outage does not stop it.
+const BROKERS = (TEST && TEST.brokers) || ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
+const MQTT_V = (TEST && TEST.mqttVersion) || 5;
+const NS = 'czyjlajk-pl/v1';
+const STALE_MS = 45000, BEAT_MS = 10000;
+
+/* ---------- small utils ---------- */
+const LS = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be blocked */ } }
+};
+const ALPH = 'abcdefghijkmnopqrstuvwxyz23456789';
+function rint(n) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+function rid(n) { let s = ''; for (let i = 0; i < n; i++) s += ALPH[rint(ALPH.length)]; return s; }
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = rint(i + 1); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
+function fnv(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const ENC = new TextEncoder(), DEC = new TextDecoder();
+const bytes = s => ENC.encode(s).length;
+const fmt = n => Number(n || 0).toLocaleString('pl-PL');
+const clampInt = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(Number(v) || 0)));
+const INVIS = /[\u0000-\u001F\u007F-\u009F­؜ᅟᅠ឴឵᠋-᠎​‌‎‏‪-‮⁠-⁯ㅤ﻿ﾠ￰-￻-]/g;
+function cleanName(s) { return Array.from(String(s || '').replace(INVIS, '').replace(/\s+/g, ' ').trim()).slice(0, 16).join('').trim(); }
+const SEG = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('pl', { granularity: 'grapheme' }) : null;
+function initial(name) {
+  const s = String(name || '').trim();
+  if (!s) return '?';
+  if (SEG) { const it = SEG.segment(s)[Symbol.iterator]().next(); if (it.value) return it.value.segment.toUpperCase(); }
+  return Array.from(s)[0].toUpperCase();
+}
+function plural(n, one, few, many) {
+  n = Math.abs(n);
+  if (n === 1) return one;
+  const d = n % 10, h = n % 100;
+  return (d >= 2 && d <= 4 && !(h >= 12 && h <= 14)) ? few : many;
+}
+const nTik = n => n + ' ' + plural(n, 'TikTok', 'TikToki', 'TikToków');
+const nOsob = n => n + ' ' + plural(n, 'osoba', 'osoby', 'osób');
+function joinNames(names) {
+  if (!names.length) return 'nie wiadomo kto';
+  if (names.length === 1) return names[0];
+  return names.slice(0, -1).join(', ') + ' i ' + names[names.length - 1];
+}
+const keyMap = pl => { const m = {}; for (const x of pl || []) m[x[0]] = x; return m; };
+function newCode() {
+  for (let i = 0; i < 60; i++) {
+    const c = CONS[rint(CONS.length)] + VOW[rint(VOW.length)] + CONS[rint(CONS.length)] + VOW[rint(VOW.length)];
+    if (!BAD_CODES.has(c)) return c;
+  }
+  return 'KOTA';
+}
+function joinLink(code) { return location.origin + location.pathname + '#' + code; }
+
+/* ---------- TikTok links ---------- */
+const URL_RE = /(?:https?:\/\/)?(?:[a-z0-9-]+\.)*tiktokv?\.(?:com|eu|us)\/[^\s"'<>\\)\]]*/gi;
+const COMPACT_RE = /^(?:@[\w.-]{1,40}\/[vp]\/\d{6,25}|s\/\d{6,25}|(?:vm|vt|t)\/[A-Za-z0-9]{4,24})$/;
+function toCompact(raw) {
+  let u = String(raw).trim().replace(/[.,;:!?]+$/, '');
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  let url;
+  try { url = new URL(u); } catch (e) { return null; }
+  const host = url.hostname.toLowerCase();
+  const base = host.replace(/^(?:www|m)\./, '');
+  const p = url.pathname;
+  let m;
+  if (base === 'tiktok.com') {
+    if ((m = p.match(/^\/@([\w.-]{1,40})\/(video|photo)\/(\d{6,25})/i))) return '@' + m[1] + '/' + (m[2].toLowerCase() === 'photo' ? 'p' : 'v') + '/' + m[3];
+    if ((m = p.match(/^\/t\/([A-Za-z0-9]{4,24})/))) return 't/' + m[1];
+    if ((m = p.match(/^\/(?:share\/video|v|embed\/v2|embed|player\/v1)\/(\d{6,25})/))) return 's/' + m[1];
+  }
+  if (/^tiktokv\.(?:com|eu|us)$/.test(base) && (m = p.match(/^\/share\/video\/(\d{6,25})/))) return 's/' + m[1];
+  if (/^(?:vm|vt)\.tiktok\.com$/.test(host) && (m = p.match(/^\/([A-Za-z0-9]{4,24})/))) return host.slice(0, 2) + '/' + m[1];
+  return null;
+}
+function identity(c) { const m = c.match(/^(?:@[^/]+\/[vp]|s)\/(\d+)$/); return m ? 'id' + m[1] : 'c' + c; }
+function dedupe(list) { const seen = new Set(); const out = []; for (const c of list) { const id = identity(c); if (!seen.has(id)) { seen.add(id); out.push(c); } } return out; }
+function extractLinks(text) {
+  const out = [];
+  for (const m of String(text || '').match(URL_RE) || []) { const c = toCompact(m); if (c && COMPACT_RE.test(c)) out.push(c); }
+  return dedupe(out);
+}
+function expand(c) {
+  let m;
+  if ((m = c.match(/^@([\w.-]+)\/([vp])\/(\d+)$/))) return 'https://www.tiktok.com/@' + m[1] + (m[2] === 'p' ? '/photo/' : '/video/') + m[3];
+  if ((m = c.match(/^s\/(\d+)$/))) return 'https://www.tiktok.com/@i/video/' + m[1];
+  if ((m = c.match(/^(vm|vt)\/([A-Za-z0-9]+)$/))) return 'https://' + m[1] + '.tiktok.com/' + m[2] + '/';
+  if ((m = c.match(/^t\/([A-Za-z0-9]+)$/))) return 'https://www.tiktok.com/t/' + m[1] + '/';
+  return 'https://www.tiktok.com/';
+}
+function videoId(c) { const m = c && c.match(/^(?:@[^/]+\/[vp]|s)\/(\d+)$/); return m ? m[1] : null; }
+const isShort = c => /^(?:vm|vt|t)\//.test(c);
+function handleOf(c) { const m = c && c.match(/^@([\w.-]+)\//); return m ? '@' + m[1] : null; }
+function describe(c) {
+  let m;
+  if ((m = c.match(/^@([^/]+)\/([vp])\/\d+$/))) return '@' + m[1] + (m[2] === 'p' ? ' · zdjęcia' : '');
+  if ((m = c.match(/^s\/(\d+)$/))) return 'Film nr …' + m[1].slice(-6);
+  if ((m = c.match(/^(vm|vt)\/(.+)$/))) return m[1] + '.tiktok.com/' + m[2];
+  if ((m = c.match(/^t\/(.+)$/))) return 'tiktok.com/t/' + m[1];
+  return c;
+}
+function mergeLinks(cur, inc) {
+  const ids = new Set(cur.map(identity));
+  const list = cur.slice();
+  let added = 0, dup = 0, cut = 0;
+  for (const c of inc) {
+    const id = identity(c);
+    if (ids.has(id)) { dup++; continue; }
+    if (list.length >= MAX_LINKS) { cut++; continue; }
+    ids.add(id); list.push(c); added++;
+  }
+  return { list, added, dup, cut };
+}
+const validLinks = arr => Array.isArray(arr) ? dedupe(arr.filter(c => typeof c === 'string' && COMPACT_RE.test(c))).slice(0, MAX_LINKS) : [];
+function thumbStyle(c) {
+  const h = fnv(c || 'x');
+  const h1 = h % 360, h2 = (h1 + 40 + ((h >>> 9) % 150)) % 360;
+  const x = 18 + ((h >>> 3) % 62), y = 12 + ((h >>> 6) % 50);
+  return 'background:radial-gradient(circle at ' + x + '% ' + y + '%,hsl(' + h1 + ' 95% 66%),transparent 58%),' +
+    'radial-gradient(circle at ' + (100 - x) + '% ' + (88 - y / 2) + '%,hsl(' + h2 + ' 90% 60%),transparent 56%),' +
+    'linear-gradient(160deg,hsl(' + h1 + ' 62% 32%),hsl(' + h2 + ' 70% 18%))';
+}
+
+/* ---------- turning short app links (vm.tiktok.com) into playable videos ---------- */
+const RES_KEY = 'czyjlajk.resolved.v1';
+const resCache = LS.get(RES_KEY) || {};
+const resTried = new Set(), resBusy = new Set(), resFailed = new Set();
+const resQueue = [];
+async function fetchWithin(url, ms, asText) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
+    if (!r.ok) throw new Error('http ' + r.status);
+    return asText ? await r.text() : await r.json();
+  } finally { clearTimeout(t); }
+}
+function fromOembed(j) {
+  if (!j || typeof j !== 'object') return null;
+  const h = String(j.html || '');
+  let id = /^\d{6,25}$/.test(String(j.embed_product_id || '')) ? String(j.embed_product_id) : null;
+  if (!id) { const m = h.match(/data-video-id="(\d{6,25})"/) || h.match(/\/(?:video|photo)\/(\d{6,25})/); if (m) id = m[1]; }
+  if (!id) return null;
+  const photo = /\/photo\//.test(h) || j.embed_type === 'photo';
+  let user = /^[\w.-]{1,40}$/.test(String(j.author_unique_id || '')) ? String(j.author_unique_id) : null;
+  if (!user) { const m = String(j.author_url || '').match(/@([\w.-]{1,40})/); if (m) user = m[1]; }
+  return user ? '@' + user + '/' + (photo ? 'p' : 'v') + '/' + id : 's/' + id;
+}
+function fromPage(text) {
+  const t = String(text || '');
+  const m = t.match(/rel="canonical"[^>]*href="https:\/\/www\.tiktok\.com\/@([\w.-]{1,40})\/(video|photo)\/(\d{6,25})/) ||
+    t.match(/property="og:url"[^>]*content="https:\/\/www\.tiktok\.com\/@([\w.-]{1,40})\/(video|photo)\/(\d{6,25})/) ||
+    t.match(/tiktok\.com\/@([\w.-]{1,40})\/(video|photo)\/(\d{6,25})/);
+  return m ? '@' + m[1] + '/' + (m[2] === 'photo' ? 'p' : 'v') + '/' + m[3] : null;
+}
+async function resolveShort(c) {
+  if (TEST && TEST.resolve) return TEST.resolve(c);
+  const url = expand(c);
+  const oe = 'https://www.tiktok.com/oembed?url=' + encodeURIComponent(url);
+  const proxy = u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u);
+  const tries = [
+    async () => fromOembed(await fetchWithin(oe, 6000)),
+    async () => fromOembed(await fetchWithin(proxy(oe), 9000)),
+    async () => fromPage(await fetchWithin(proxy(url), 10000, true))
+  ];
+  for (const attempt of tries) {
+    try { const r = await attempt(); if (r && COMPACT_RE.test(r) && !isShort(r)) return r; } catch (e) { /* next way */ }
+  }
+  return null;
+}
+function replaceIn(list, from, to) {
+  if (!list.includes(from)) return list;
+  return dedupe(list.map(x => x === from ? to : x));
+}
+function applyResolved(pairs) {
+  set(s => {
+    for (const [from, to] of pairs) {
+      s.me.links = replaceIn(s.me.links, from, to);
+      if (s.solo) for (const p of s.solo.players) p.links = replaceIn(p.links, from, to);
+    }
+  });
+}
+function scheduleResolve() {
+  const all = S.me.links.concat(S.solo ? S.solo.players.flatMap(p => p.links) : []);
+  const hits = [];
+  for (const c of all) {
+    if (!isShort(c) || resTried.has(c)) continue;
+    resTried.add(c);
+    if (resCache[c]) hits.push([c, resCache[c]]);
+    else resQueue.push(c);
+  }
+  if (hits.length) setTimeout(() => applyResolved(hits), 0);
+  pumpResolve();
+}
+function pumpResolve() {
+  while (resBusy.size < 2 && resQueue.length) {
+    const c = resQueue.shift();
+    resBusy.add(c);
+    resolveShort(c).then(r => {
+      resBusy.delete(c);
+      if (r) { resCache[c] = r; LS.set(RES_KEY, resCache); applyResolved([[c, r]]); }
+      else { resFailed.add(c); rerender(); }
+      pumpResolve();
+    });
+  }
+}
+function linkState(c) {
+  if (videoId(c)) return 'ok';
+  if (resBusy.has(c) || resQueue.includes(c)) return 'wait';
+  return 'out';
+}
+
+/* ---------- reading TikTok's data export ---------- */
+function findKey(o, re, depth) {
+  if (!o || typeof o !== 'object' || depth > 5) return null;
+  if (!Array.isArray(o)) for (const k of Object.keys(o)) if (re.test(k) && o[k] && typeof o[k] === 'object') return o[k];
+  const vals = Array.isArray(o) ? o.slice(0, 50) : Object.values(o);
+  for (const v of vals) { const r = findKey(v, re, depth + 1); if (r) return r; }
+  return null;
+}
+function collectStrings(o, fn, depth) {
+  if (o == null || depth > 8) return;
+  if (typeof o === 'string') { fn(o); return; }
+  if (Array.isArray(o)) { for (const x of o) collectStrings(x, fn, depth + 1); return; }
+  if (typeof o === 'object') for (const k in o) collectStrings(o[k], fn, depth + 1);
+}
+function linksFromJson(data) {
+  if (!data || typeof data !== 'object') return null;
+  let list = null;
+  for (const k of ['Likes and Favorites', 'Your Activity', 'Activity']) {
+    const sec = data[k];
+    if (sec && typeof sec === 'object' && sec['Like List']) { list = sec['Like List']; break; }
+  }
+  if (!list && data['Like List']) list = data['Like List'];
+  if (!list) list = findKey(data, /^(like ?list|liked videos?|itemfavoritelist)$/i, 0);
+  if (!list) return null;
+  const out = [];
+  collectStrings(list, s => { if (/tiktok/i.test(s)) for (const c of extractLinks(s)) out.push(c); }, 0);
+  return dedupe(out);
+}
+function linksFromTxt(text) {
+  const idx = text.search(/like\s*list/i);
+  if (idx < 0) return null;
+  const lines = text.slice(idx).split(/\r?\n/).slice(1);
+  const out = [];
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    if (/tiktok/i.test(t)) { for (const c of extractLinks(t)) out.push(c); continue; }
+    if (/^(date|data|time|link|video|sound)\b/i.test(t)) continue;
+    if (out.length) break;
+  }
+  return dedupe(out);
+}
+let jszipP = null;
+function loadJSZip() {
+  if (window.JSZip) return Promise.resolve(window.JSZip);
+  if (!jszipP) jszipP = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+    s.onload = () => window.JSZip ? res(window.JSZip) : rej(new Error('zip'));
+    s.onerror = () => { jszipP = null; rej(new Error('zip')); };
+    document.head.appendChild(s);
+  });
+  return jszipP;
+}
+async function importFile(file) {
+  const name = (file.name || '').toLowerCase();
+  if (/\.zip$/.test(name) || /zip/.test(file.type || '')) {
+    const JSZip = await loadJSZip();
+    let zip;
+    try { zip = await JSZip.loadAsync(file); } catch (e) { throw new Error('zip'); }
+    const files = Object.values(zip.files).filter(f => !f.dir);
+    for (const f of files.filter(f => /\.json$/i.test(f.name))) {
+      try { const r = linksFromJson(JSON.parse(await f.async('string'))); if (r) return r; } catch (e) { /* try next */ }
+    }
+    const likeTxt = files.find(f => /\.txt$/i.test(f.name) && /like/i.test(f.name.split('/').pop()));
+    if (likeTxt) return extractLinks(await likeTxt.async('string'));
+    for (const f of files.filter(f => /\.txt$/i.test(f.name))) {
+      const r = linksFromTxt(await f.async('string'));
+      if (r && r.length) return r;
+    }
+    return null;
+  }
+  const text = await file.text();
+  if (/\.json$/.test(name) || /^\s*[{[]/.test(text)) {
+    try { const r = linksFromJson(JSON.parse(text)); if (r) return r; } catch (e) { /* not JSON */ }
+  }
+  if (/like/.test(name)) return extractLinks(text);
+  return linksFromTxt(text);
+}
+
+/* ---------- game rules ---------- */
+function buildDeck(players, used) {
+  const byId = new Map();
+  for (const p of players) for (const c of validLinks(p.links)) {
+    const id = identity(c);
+    let it = byId.get(id);
+    if (!it) { it = { id, c, o: [] }; byId.set(id, it); }
+    if (!it.o.includes(p.key)) it.o.push(p.key);
+    if (!handleOf(it.c) && handleOf(c)) it.c = c;
+  }
+  const queues = new Map();
+  for (const it of shuffle([...byId.values()].filter(it => !used.has(it.id)))) {
+    const k = it.o[rint(it.o.length)];
+    if (!queues.has(k)) queues.set(k, []);
+    queues.get(k).push(it);
+  }
+  const deck = [];
+  let keys = [...queues.keys()];
+  while (keys.length) {
+    for (const k of shuffle(keys.slice())) { const q = queues.get(k); if (q.length) deck.push(q.pop()); }
+    keys = keys.filter(k => queues.get(k).length);
+  }
+  return deck;
+}
+function scoreRound(owners, votes) {
+  const d = {};
+  for (const voter in votes) {
+    if (owners.includes(voter)) continue;
+    if (owners.includes(votes[voter])) d[voter] = (d[voter] || 0) + GUESS;
+    else for (const o of owners) d[o] = (d[o] || 0) + FOOL;
+  }
+  return d;
+}
+function computeAwards(hist) {
+  const correct = {}, fooled = {};
+  let hard = null;
+  for (const h of hist) {
+    const voters = Object.keys(h.vt).filter(v => !h.o.includes(v));
+    let wrong = 0;
+    for (const v of voters) {
+      if (h.o.includes(h.vt[v])) correct[v] = (correct[v] || 0) + 1;
+      else { wrong++; for (const o of h.o) fooled[o] = (fooled[o] || 0) + 1; }
+    }
+    if (voters.length && wrong) {
+      const ratio = wrong / voters.length;
+      if (!hard || ratio > hard.r || (ratio === hard.r && voters.length > hard.m)) hard = { r: ratio, n: wrong, m: voters.length, l: h.c, o: h.o };
+    }
+  }
+  const top = m => { let b = null; for (const k in m) if (!b || m[k] > b[1]) b = [k, m[k]]; return b; };
+  const aw = [];
+  const det = top(correct); if (det) aw.push({ t: 'det', k: det[0], n: det[1] });
+  const cam = top(fooled); if (cam) aw.push({ t: 'cam', k: cam[0], n: cam[1] });
+  if (hard) aw.push({ t: 'hard', l: hard.l, o: hard.o.slice(0, 4), n: hard.n, m: hard.m });
+  return aw;
+}
+function rankList(pl, sc) {
+  const arr = (pl || []).map(x => ({ x, s: (sc && sc[x[0]]) || 0 }));
+  arr.sort((a, b) => b.s - a.s || a.x[1].localeCompare(b.x[1], 'pl'));
+  let last = null, rk = 0;
+  arr.forEach((r, i) => { if (r.s !== last) { rk = i + 1; last = r.s; } r.rank = rk; });
+  return arr;
+}
+function addScores(sc, d) { const o = Object.assign({}, sc); for (const k in d) o[k] = (o[k] || 0) + d[k]; return o; }
+function uniqueNames(players) {
+  const seen = {};
+  return players.map(p => { let n = p.name; const base = n.toLowerCase(); seen[base] = (seen[base] || 0) + 1; if (seen[base] > 1) n = cleanName(n.slice(0, 13) + ' ' + seen[base]); return n; });
+}
+
+/* ---------- state ---------- */
+const S = {
+  me: { key: 'p' + rid(9), name: '', links: [] },
+  mode: 'home',
+  code: null, isHost: false, host: null, joinedAt: 0, myVote: null, sessionAt: 0,
+  roomStatus: 'connecting', connected: false, discSince: 0, peers: [],
+  hostG: null, lastG: null, hostSeen: false, hostAway: false, searchStart: 0,
+  solo: null, toast: null, homeNotice: null, hashCode: null
+};
+function snapshot() {
+  return { me: S.me, mode: S.mode, code: S.code, isHost: S.isHost, host: S.host, joinedAt: S.joinedAt, myVote: S.myVote, sessionAt: S.sessionAt, solo: S.solo };
+}
+let persistT = 0;
+function persist() { clearTimeout(persistT); persistT = setTimeout(() => LS.set(STORE, snapshot()), 120); }
+function restore(sv) {
+  if (!sv || typeof sv !== 'object') return;
+  const me = sv.me;
+  if (me && typeof me.key === 'string' && /^[a-z0-9]{6,16}$/.test(me.key)) S.me = { key: me.key, name: cleanName(me.name), links: validLinks(me.links) };
+  const fresh = Date.now() - (Number(sv.sessionAt) || 0) < 12 * 3600 * 1000;
+  if (sv.mode === 'multi' && fresh && typeof sv.code === 'string' && /^[A-Z]{4}$/.test(sv.code)) {
+    S.mode = 'multi'; S.code = sv.code; S.sessionAt = sv.sessionAt;
+    S.isHost = !!(sv.isHost && sv.host && sv.host.g && sv.host.g.id);
+    S.host = S.isHost ? sv.host : null;
+    if (S.host) { S.host.deck = S.host.deck || []; S.host.hist = S.host.hist || []; S.host.used = S.host.used || []; S.host.skips = S.host.skips || 0; S.host.tv = !!S.host.tv; }
+    S.joinedAt = Number(sv.joinedAt) || Date.now();
+    S.myVote = sv.myVote && typeof sv.myVote.r === 'string' ? sv.myVote : null;
+    S.searchStart = Date.now();
+  }
+  if (sv.solo && typeof sv.solo === 'object' && Array.isArray(sv.solo.players)) {
+    S.solo = sv.solo;
+    if (sv.mode === 'solo' && fresh) S.mode = 'solo';
+  }
+}
+let renderQueued = false;
+function rerender() {
+  if (renderQueued) return;
+  renderQueued = true;
+  requestAnimationFrame(() => { renderQueued = false; render(html`<${App} />`, root); });
+}
+function set(fn) { fn(S); persist(); syncPresence(); scheduleResolve(); rerender(); }
+let toastT = 0;
+function toast(msg) { S.toast = msg; rerender(); clearTimeout(toastT); toastT = setTimeout(() => { S.toast = null; rerender(); }, 2800); }
+
+/* ---------- relay: presence over public MQTT brokers ---------- */
+// Same shape the game expects from a live room: presence(), peers(), onPeers(), onConnection(), leave().
+const CID = 'c' + rid(10);
+function relayJoin(name) {
+  const base = NS + '/' + name;
+  const myTopic = base + '/p/' + CID;
+  const boards = BROKERS.map(() => new Map());
+  const listeners = new Set(), connL = new Set(), objCache = new Map();
+  const pubOpts = MQTT_V === 5 ? { qos: 1, retain: true, properties: { messageExpiryInterval: 6 * 3600 } } : { qos: 1, retain: true };
+  let mine = {}, hasMine = false, seq = 0, closed = false, snap = Object.freeze([]), selfObj = null, emitT = 0, lastConn = false;
+  const clients = BROKERS.map((url, bi) => {
+    let cl = null;
+    try {
+      cl = window.mqtt.connect(url, {
+        clientId: CID + '_' + bi + '_' + rid(4), protocolVersion: MQTT_V, keepalive: 25, reconnectPeriod: 2500, connectTimeout: 10000, clean: true,
+        will: { topic: myTopic, payload: '', qos: 1, retain: true }
+      });
+    } catch (e) { return null; }
+    cl.on('connect', () => {
+      if (closed) return;
+      cl.subscribe(base + '/p/+', { qos: 1 });
+      if (hasMine) cl.publish(myTopic, frame(), pubOpts);
+      connChanged();
+    });
+    cl.on('close', connChanged);
+    cl.on('offline', connChanged);
+    cl.on('error', () => {});
+    cl.on('message', (topic, payload) => onMessage(bi, topic, payload));
+    return cl;
+  });
+  function frame() { seq += 1; return JSON.stringify({ s: seq, t: Date.now(), p: mine }); }
+  function publishAll() {
+    if (closed || !hasMine) return;
+    const txt = frame();
+    for (const cl of clients) if (cl && cl.connected) { try { cl.publish(myTopic, txt, pubOpts); } catch (e) { /* reconnect will resend */ } }
+  }
+  function onMessage(bi, topic, payload) {
+    if (closed) return;
+    const cid = topic.slice(topic.lastIndexOf('/') + 1);
+    if (!/^c[a-z0-9]{10}$/.test(cid) || cid === CID) return;
+    const board = boards[bi];
+    if (!payload || !payload.length) { if (board.delete(cid)) scheduleEmit(); return; }
+    let m;
+    try { m = JSON.parse(DEC.decode(payload)); } catch (e) { return; }
+    if (!m || typeof m !== 'object' || typeof m.s !== 'number' || typeof m.t !== 'number' || !m.p || typeof m.p !== 'object' || Array.isArray(m.p)) return;
+    const prev = board.get(cid);
+    if (prev && prev.s >= m.s) return;
+    board.set(cid, { s: m.s, t: m.t, p: m.p });
+    scheduleEmit();
+  }
+  function selfPeer() {
+    if (!selfObj) selfObj = Object.freeze({ peer: CID, by: null, isMe: true, sameTab: true, kind: 'viewer', guest: false, presence: Object.freeze(Object.assign({}, mine)), updatedAt: Date.now() });
+    return selfObj;
+  }
+  function rebuild() {
+    const now = Date.now();
+    const merged = new Map();
+    for (const board of boards) for (const [cid, e] of board) {
+      if (now - e.t > STALE_MS) continue;
+      const cur = merged.get(cid);
+      if (!cur || e.s > cur.s) merged.set(cid, e);
+    }
+    const arr = hasMine ? [selfPeer()] : [];
+    for (const [cid, e] of merged) {
+      let c = objCache.get(cid);
+      if (!c || c.s !== e.s) {
+        c = { s: e.s, obj: Object.freeze({ peer: cid, by: null, isMe: false, sameTab: false, kind: 'viewer', guest: false, presence: Object.freeze(e.p), updatedAt: now }) };
+        objCache.set(cid, c);
+      }
+      arr.push(c.obj);
+    }
+    snap = Object.freeze(arr);
+  }
+  function scheduleEmit() {
+    if (emitT || closed) return;
+    emitT = setTimeout(() => {
+      emitT = 0;
+      if (closed) return;
+      rebuild();
+      const ch = { peers: snap, joined: [], left: [], updated: [] };
+      for (const l of listeners) { try { l(ch); } catch (e) { console.error(e); } }
+    }, 30);
+  }
+  function connected() { return clients.some(cl => cl && cl.connected); }
+  function connChanged() {
+    const c = connected();
+    if (c === lastConn) return;
+    lastConn = c;
+    for (const l of connL) { try { l(c); } catch (e) { console.error(e); } }
+  }
+  const beatT = setInterval(publishAll, BEAT_MS);
+  const sweepT = setInterval(scheduleEmit, 5000);
+  return {
+    name,
+    presence(patch) {
+      if (closed) return Promise.resolve();
+      for (const k in patch) { if (patch[k] === null) delete mine[k]; else mine[k] = patch[k]; }
+      mine = JSON.parse(JSON.stringify(mine));
+      hasMine = true; selfObj = null;
+      publishAll(); scheduleEmit();
+      return Promise.resolve();
+    },
+    peers() { return snap; },
+    onPeers(h) { listeners.add(h); setTimeout(() => { if (!closed && listeners.has(h)) h({ peers: snap, joined: snap, left: [], updated: [] }); }, 0); return () => listeners.delete(h); },
+    connected,
+    onConnection(h) { connL.add(h); setTimeout(() => { if (!closed && connL.has(h)) h(connected()); }, 0); return () => connL.delete(h); },
+    farewell() {
+      // best effort when the page goes away: clear our presence right now
+      for (const cl of clients) if (cl && cl.connected) { try { cl.publish(myTopic, '', { qos: 0, retain: true }); } catch (e) { /* page is closing */ } }
+    },
+    leave() {
+      if (closed) return Promise.resolve();
+      closed = true;
+      clearInterval(beatT); clearInterval(sweepT); clearTimeout(emitT);
+      listeners.clear(); connL.clear();
+      return Promise.all(clients.map(cl => new Promise(res => {
+        if (!cl) return res();
+        let done = false;
+        const fin = () => { if (done) return; done = true; try { cl.end(true); } catch (e) { /* already closed */ } res(); };
+        if (cl.connected) { try { cl.publish(myTopic, '', { qos: 1, retain: true }, fin); } catch (e) { fin(); } setTimeout(fin, 1500); }
+        else fin();
+      }))).then(() => {});
+    }
+  };
+}
+
+let CH = null, unsubs = [], lastPresence = null, roomReady = null;
+function initRelay() {
+  const ok = !!(window.mqtt && typeof window.mqtt.connect === 'function');
+  S.roomStatus = ok ? 'ok' : 'unavailable';
+  if (!ok && S.mode === 'multi') { S.mode = 'home'; S.homeNotice = 'Nie udało się wczytać połączenia z innymi telefonami. Odśwież stronę albo zagrajcie na jednym telefonie.'; persist(); }
+  rerender();
+  if (ok && S.mode === 'multi' && S.code) connectGame().catch(() => {});
+  return Promise.resolve(ok);
+}
+async function connectGame() {
+  await disconnectGame();
+  if (S.mode !== 'multi' || !S.code) return;
+  const ch = relayJoin('g-' + S.code.toLowerCase());
+  CH = ch;
+  unsubs.push(ch.onPeers(chg => { if (CH !== ch) return; S.peers = chg.peers; onPeersChanged(); }));
+  unsubs.push(ch.onConnection(c => {
+    if (CH !== ch) return;
+    S.connected = c;
+    if (c) S.discSince = 0;
+    else if (!S.discSince) { S.discSince = Date.now(); setTimeout(rerender, 2200); setTimeout(rerender, 12200); }
+    rerender();
+  }));
+  S.peers = ch.peers();
+  S.discSince = Date.now(); setTimeout(rerender, 2200); setTimeout(rerender, 12200);
+  lastPresence = null;
+  syncPresence();
+  rerender();
+}
+async function disconnectGame() {
+  const ch = CH;
+  CH = null;
+  for (const u of unsubs.splice(0)) { try { u(); } catch (e) { /* already gone */ } }
+  S.peers = []; S.connected = false; S.discSince = 0; lastPresence = null;
+  if (ch) { try { await ch.leave(); } catch (e) { /* best effort */ } }
+}
+function gamePeers() {
+  const out = new Map();
+  for (const p of S.peers) {
+    if (!p || p.kind !== 'viewer') continue;
+    const pr = p.presence || {};
+    if (pr.v !== 1 || pr.code !== S.code || typeof pr.key !== 'string' || !/^[a-z0-9]{4,16}$/.test(pr.key)) continue;
+    const prev = out.get(pr.key);
+    if (!prev || p.sameTab || (!prev.sameTab && (p.updatedAt || 0) > (prev.updatedAt || 0))) out.set(pr.key, p);
+  }
+  return [...out.values()];
+}
+function lobbyPlayers() {
+  const list = gamePeers().map(p => {
+    const pr = p.presence;
+    const me = pr.key === S.me.key;
+    return {
+      key: pr.key,
+      name: me ? (S.me.name || 'Gracz') : (cleanName(pr.name) || 'Gracz'),
+      jt: Number(pr.jt) || 0,
+      links: me ? S.me.links : validLinks(pr.links),
+      vote: me ? S.myVote : (pr.vote && typeof pr.vote === 'object' ? pr.vote : null),
+      hostTag: !!(pr.g && typeof pr.g === 'object'),
+      me
+    };
+  });
+  if (S.mode === 'multi' && !list.some(p => p.me)) list.push({ key: S.me.key, name: S.me.name || 'Gracz', jt: S.joinedAt, links: S.me.links, vote: S.myVote, hostTag: S.isHost, me: true });
+  list.sort((a, b) => (a.jt - b.jt) || (a.key < b.key ? -1 : 1));
+  return list;
+}
+function hostPeer() {
+  let best = null;
+  for (const p of gamePeers()) {
+    const g = p.presence.g;
+    if (!g || typeof g !== 'object' || typeof g.t0 !== 'number') continue;
+    if (!best || g.t0 < best.presence.g.t0 || (g.t0 === best.presence.g.t0 && p.peer < best.peer)) best = p;
+  }
+  return best;
+}
+const gCache = new WeakMap();
+function objNum(o) { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o).slice(0, 40)) { const v = Number(o[k]); if (isFinite(v)) r[k] = v; } return r; }
+function objStr(o) { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o).slice(0, 40)) if (typeof o[k] === 'string') r[k] = o[k]; return r; }
+function sanitizeG(g) {
+  if (!g || typeof g !== 'object') return null;
+  if (gCache.has(g)) return gCache.get(g);
+  const out = {
+    id: String(g.id || ''), t0: Number(g.t0) || 0, gid: String(g.gid || ''),
+    ph: ['lobby', 'play', 'reveal', 'end'].includes(g.ph) ? g.ph : 'lobby',
+    n: clampInt(g.n, 0, 99), i: clampInt(g.i, 0, 99), tv: !!g.tv,
+    r: typeof g.r === 'string' ? g.r : null,
+    l: typeof g.l === 'string' && COMPACT_RE.test(g.l) ? g.l : null,
+    pl: Array.isArray(g.pl) ? g.pl.filter(x => Array.isArray(x) && typeof x[0] === 'string').slice(0, MAX_PLAYERS).map(x => [x[0], cleanName(x[1]) || 'Gracz', clampInt(x[2], 0, COLORS.length - 1)]) : [],
+    sc: objNum(g.sc), rv: null,
+    aw: Array.isArray(g.aw) ? g.aw.slice(0, 4).filter(a => a && typeof a === 'object').map(a => ({
+      t: String(a.t || ''), k: typeof a.k === 'string' ? a.k : null, n: clampInt(a.n, 0, 999), m: clampInt(a.m, 0, 999),
+      l: typeof a.l === 'string' && COMPACT_RE.test(a.l) ? a.l : null,
+      o: Array.isArray(a.o) ? a.o.filter(x => typeof x === 'string').slice(0, 8) : []
+    })) : []
+  };
+  if (g.rv && typeof g.rv === 'object') out.rv = { o: Array.isArray(g.rv.o) ? g.rv.o.filter(x => typeof x === 'string').slice(0, 8) : [], vt: objStr(g.rv.vt), d: objNum(g.rv.d) };
+  if ((out.ph === 'play' || out.ph === 'reveal') && !out.l) out.ph = 'lobby';
+  if (out.ph === 'reveal' && !out.rv) out.rv = { o: [], vt: {}, d: {} };
+  gCache.set(g, out);
+  return out;
+}
+function refreshHostView() {
+  const hp = hostPeer();
+  if (hp) { S.hostG = sanitizeG(hp.presence.g); S.lastG = S.hostG; S.hostSeen = true; S.hostAway = false; }
+  else { S.hostG = null; S.hostAway = S.hostSeen; }
+}
+function currentG() { return (S.isHost && S.host) ? S.host.g : (S.hostG || S.lastG || null); }
+function desiredPresence() {
+  if (S.mode !== 'multi' || !S.code) return null;
+  const G = currentG();
+  const p = { v: 1, code: S.code, key: S.me.key, name: S.me.name || 'Gracz', jt: S.joinedAt || 0, links: null, vote: null, g: null };
+  if (!G || G.ph === 'lobby') p.links = S.me.links.slice(0, MAX_LINKS);
+  if (G && G.ph === 'play' && S.myVote && S.myVote.r === G.r) p.vote = S.myVote;
+  if (S.isHost && S.host) p.g = S.host.g;
+  let txt = JSON.stringify(p);
+  while (bytes(txt) > 3900 && p.links && p.links.length) { p.links = p.links.slice(0, Math.floor(p.links.length * 0.8)); txt = JSON.stringify(p); }
+  return p;
+}
+function syncPresence() {
+  if (!CH) return;
+  const p = desiredPresence();
+  if (!p) return;
+  const txt = JSON.stringify(p);
+  if (txt === lastPresence) return;
+  lastPresence = txt;
+  CH.presence(p).catch(() => { lastPresence = null; });
+}
+function onPeersChanged() {
+  if (S.mode !== 'multi') return;
+  if (S.isHost && S.host) hostOnPeers();
+  else refreshHostView();
+  syncPresence();
+  rerender();
+}
+
+/* ---------- host engine (runs only on the host's phone) ---------- */
+let revealT = 0, regenAt = 0;
+function commitHost() { S.sessionAt = Date.now(); persist(); syncPresence(); rerender(); }
+function hostOnPeers() {
+  const H = S.host, G = H.g;
+  if (G.ph === 'lobby') {
+    const clash = gamePeers().find(p => !p.sameTab && p.presence.key !== S.me.key && p.presence.g && typeof p.presence.g === 'object' && p.presence.g.id !== G.id && Number(p.presence.g.t0) <= G.t0);
+    if (clash && Date.now() - regenAt > 5000) {
+      regenAt = Date.now();
+      S.code = newCode(); persist();
+      toast('Ten kod był zajęty. Nowy kod: ' + S.code);
+      connectGame().catch(() => {});
+    }
+    return;
+  }
+  let changed = false;
+  for (const p of lobbyPlayers()) {
+    const ex = G.pl.find(x => x[0] === p.key);
+    if (!ex) {
+      if (G.pl.length >= MAX_PLAYERS) continue;
+      const usedCols = new Set(G.pl.map(x => x[2]));
+      let col = 0; while (usedCols.has(col) && col < COLORS.length - 1) col++;
+      G.pl.push([p.key, p.name, col]);
+      if (!(p.key in G.sc)) G.sc[p.key] = 0;
+      changed = true;
+    }
+  }
+  if (G.ph === 'play') checkAllVoted();
+  if (changed) commitHost();
+}
+function collectVotes() {
+  const G = S.host.g;
+  const keys = new Set(G.pl.map(x => x[0]));
+  const out = {};
+  for (const p of lobbyPlayers()) {
+    const v = p.vote;
+    if (!v || typeof v !== 'object' || v.r !== G.r || typeof v.k !== 'string') continue;
+    if (!keys.has(p.key) || !keys.has(v.k) || v.k === p.key) continue;
+    out[p.key] = v.k;
+  }
+  return out;
+}
+function voteCache() {
+  const H = S.host;
+  if (!H.vc || H.vc.r !== H.g.r) H.vc = { r: H.g.r, m: {} };
+  Object.assign(H.vc.m, collectVotes());
+  return H.vc.m;
+}
+function checkAllVoted() {
+  const G = S.host.g;
+  if (G.ph !== 'play') { clearTimeout(revealT); revealT = 0; return; }
+  const votes = voteCache();
+  const present = new Set(lobbyPlayers().map(p => p.key));
+  const need = G.pl.filter(x => present.has(x[0]));
+  const all = need.length >= 2 && need.every(x => votes[x[0]]);
+  if (all && !revealT) revealT = setTimeout(() => { revealT = 0; doReveal(); }, 1100);
+  else if (!all && revealT) { clearTimeout(revealT); revealT = 0; }
+}
+function markUsed(id) { const u = S.host.used; if (!u.includes(id)) u.push(id); if (u.length > 400) u.splice(0, u.length - 400); }
+function doReveal() {
+  const H = S.host, G = H.g;
+  if (G.ph !== 'play') return;
+  clearTimeout(revealT); revealT = 0;
+  const item = H.deck[G.i - 1];
+  if (!item) return;
+  const votes = Object.assign({}, voteCache());
+  const owners = item.o.slice();
+  const d = scoreRound(owners, votes);
+  for (const k in d) G.sc[k] = (G.sc[k] || 0) + d[k];
+  G.rv = { o: owners, vt: votes, d };
+  G.ph = 'reveal';
+  H.hist.push({ c: item.c, o: owners, vt: votes });
+  markUsed(item.id);
+  commitHost();
+}
+function beginRound() {
+  const H = S.host, G = H.g;
+  const item = H.deck[G.i - 1];
+  if (!item) { finishGame(); return; }
+  G.l = item.c;
+  G.r = G.gid + '.' + G.i + '.' + H.skips;
+  G.rv = null; G.ph = 'play'; H.vc = null;
+  commitHost();
+}
+function finishGame() {
+  const H = S.host, G = H.g;
+  G.ph = 'end'; G.l = null; G.rv = null; G.r = null;
+  G.aw = computeAwards(H.hist);
+  commitHost();
+}
+function hostNext() {
+  const G = S.host.g;
+  if (G.ph === 'play') return;
+  if (G.i >= G.n) { finishGame(); return; }
+  G.i += 1;
+  beginRound();
+}
+function hostSkip() {
+  const H = S.host, G = H.g;
+  if (G.ph !== 'play') return;
+  const item = H.deck[G.i - 1];
+  if (item) markUsed(item.id);
+  H.deck.splice(G.i - 1, 1);
+  H.skips += 1;
+  if (H.deck.length < G.n) G.n = H.deck.length;
+  if (G.i > G.n) { G.i = Math.max(G.n, 1); finishGame(); return; }
+  beginRound();
+}
+function hostStart() {
+  const H = S.host, G = H.g;
+  const players = lobbyPlayers().slice(0, MAX_PLAYERS);
+  if (players.filter(p => p.links.length).length < 2) { toast('Potrzeba co najmniej 2 osób z TikTokami.'); return; }
+  let deck = buildDeck(players, new Set(H.used));
+  if (!deck.length) { H.used = []; deck = buildDeck(players, new Set()); toast('Wszystkie TikToki już były, więc losuję od nowa.'); }
+  const n = Math.min(H.rounds, deck.length);
+  H.deck = shuffle(deck.slice(0, n)).concat(deck.slice(n));
+  H.hist = []; H.skips = 0; H.vc = null;
+  const names = uniqueNames(players);
+  G.pl = players.map((p, i) => [p.key, names[i], i % COLORS.length]);
+  G.sc = {}; for (const p of players) G.sc[p.key] = 0;
+  G.gid = rid(4); G.n = n; G.i = 1; G.aw = null; G.tv = !!H.tv;
+  set(s => { s.myVote = null; });
+  beginRound();
+}
+function hostToLobby() {
+  const G = S.host.g;
+  clearTimeout(revealT); revealT = 0;
+  G.ph = 'lobby'; G.pl = null; G.sc = null; G.rv = null; G.aw = null; G.l = null; G.r = null; G.i = 0; G.n = S.host.rounds;
+  commitHost();
+}
+
+/* ---------- actions ---------- */
+let wake = null;
+async function requestWake() {
+  try {
+    if (!wake && navigator.wakeLock && document.visibilityState === 'visible') {
+      wake = await navigator.wakeLock.request('screen');
+      wake.addEventListener('release', () => { wake = null; });
+    }
+  } catch (e) { wake = null; }
+}
+function releaseWake() { try { if (wake) wake.release(); } catch (e) { /* ignore */ } wake = null; }
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && S.mode !== 'home') requestWake();
+  if (document.visibilityState === 'hidden') { clearTimeout(persistT); LS.set(STORE, snapshot()); }
+});
+window.addEventListener('pagehide', () => { clearTimeout(persistT); LS.set(STORE, snapshot()); if (CH) CH.farewell(); });
+async function createGame(name) {
+  const now = Date.now();
+  set(s => {
+    s.me.name = name; s.mode = 'multi'; s.code = newCode(); s.isHost = true; s.joinedAt = now; s.myVote = null; s.sessionAt = now;
+    s.hostG = null; s.lastG = null; s.hostSeen = false; s.homeNotice = null;
+    s.host = { g: { id: rid(6), t0: now, gid: '', ph: 'lobby', n: 10, i: 0, tv: false, r: null, l: null, pl: null, sc: null, rv: null, aw: null }, rounds: 10, tv: false, deck: [], hist: [], used: [], skips: 0, vc: null };
+  });
+  try { await connectGame(); requestWake(); }
+  catch (e) { set(s => { s.mode = 'home'; s.isHost = false; s.host = null; s.homeNotice = 'Nie udało się połączyć z serwerem gry. Spróbuj jeszcze raz albo zagrajcie na jednym telefonie.'; }); }
+}
+async function joinGame(name, code) {
+  const now = Date.now();
+  set(s => {
+    s.me.name = name; s.mode = 'multi'; s.code = code; s.isHost = false; s.host = null; s.joinedAt = now; s.myVote = null; s.sessionAt = now;
+    s.hostG = null; s.lastG = null; s.hostSeen = false; s.searchStart = now; s.homeNotice = null;
+  });
+  try { history.replaceState(null, '', location.pathname); } catch (e) { /* keep the hash */ }
+  setTimeout(rerender, 6600);
+  try { await connectGame(); requestWake(); }
+  catch (e) { set(s => { s.mode = 'home'; s.homeNotice = 'Nie udało się połączyć z grą. Spróbuj jeszcze raz.'; }); }
+}
+async function leaveGame() {
+  clearTimeout(revealT); revealT = 0;
+  if (S.mode === 'multi') await disconnectGame();
+  set(s => {
+    if (s.mode === 'solo' && s.solo) s.solo.g = { ph: 'setup' };
+    s.mode = 'home'; s.code = null; s.isHost = false; s.host = null; s.myVote = null;
+    s.hostG = null; s.lastG = null; s.hostSeen = false; s.hostAway = false;
+  });
+  releaseWake();
+}
+function castVote(G, k) {
+  if (G.ph !== 'play') return;
+  set(s => { s.myVote = { r: G.r, k }; });
+  if (S.isHost && S.host) checkAllVoted();
+}
+function copyText(text, okMsg) {
+  try {
+    navigator.clipboard.writeText(text).then(() => toast(okMsg), () => toast(text));
+  } catch (e) { toast(text); }
+}
+function shareJoin(code) {
+  const url = joinLink(code);
+  if (navigator.share) {
+    navigator.share({ title: 'Czyj to lajk?', text: 'Wchodź do gry „Czyj to lajk?”. Kod: ' + code, url }).catch(err => { if (!err || err.name !== 'AbortError') copyText(url, 'Skopiowano link do gry'); });
+  } else copyText(url, 'Skopiowano link do gry');
+}
+function qrSvg(text) {
+  try {
+    if (!window.qrcode) return null;
+    const q = window.qrcode(0, 'M');
+    q.addData(text);
+    q.make();
+    return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  } catch (e) { return null; }
+}
+
+/* ---------- one-phone mode ---------- */
+function soloInit() {
+  set(s => {
+    s.mode = 'solo'; s.homeNotice = null; s.sessionAt = Date.now();
+    if (!s.solo) s.solo = { players: [], rounds: 10, g: { ph: 'setup' }, deck: [], hist: [], used: [], skips: 0, guessed: {} };
+    s.solo.g = s.solo.g && s.solo.g.ph ? s.solo.g : { ph: 'setup' };
+    if (!s.solo.players.length && s.me.name) s.solo.players.push({ key: s.me.key, name: s.me.name, links: s.me.links.slice() });
+  });
+  requestWake();
+}
+function soloStart() {
+  const so = S.solo;
+  if (so.players.filter(p => p.links.length).length < 2) { toast('Potrzeba co najmniej 2 osób z TikTokami.'); return; }
+  let deck = buildDeck(so.players, new Set(so.used || []));
+  if (!deck.length) { so.used = []; deck = buildDeck(so.players, new Set()); toast('Wszystkie TikToki już były, więc losuję od nowa.'); }
+  const n = Math.min(so.rounds, deck.length);
+  const names = uniqueNames(so.players);
+  set(s => {
+    const o = s.solo;
+    o.deck = shuffle(deck.slice(0, n)).concat(deck.slice(n));
+    o.hist = []; o.skips = 0; o.guessed = {};
+    o.g = { ph: 'play', gid: rid(4), n, i: 1, l: o.deck[0].c, pl: o.players.map((p, i) => [p.key, names[i], i % COLORS.length]), sc: Object.fromEntries(o.players.map(p => [p.key, 0])), rv: null, aw: null };
+  });
+}
+function soloVotes() {
+  const so = S.solo, item = so.deck[so.g.i - 1];
+  const vt = {};
+  for (const x of so.g.pl) if (!item.o.includes(x[0])) vt[x[0]] = so.guessed[x[0]] ? item.o[0] : '?';
+  return vt;
+}
+function soloNext() {
+  set(s => {
+    const o = s.solo, g = o.g, item = o.deck[g.i - 1];
+    const vt = soloVotes();
+    const d = scoreRound(item.o, vt);
+    for (const k in d) g.sc[k] = (g.sc[k] || 0) + d[k];
+    o.hist.push({ c: item.c, o: item.o, vt });
+    o.used = o.used || []; if (!o.used.includes(item.id)) o.used.push(item.id);
+    o.guessed = {};
+    if (g.i >= g.n) { g.ph = 'end'; g.aw = computeAwards(o.hist); g.l = null; }
+    else { g.i += 1; g.l = o.deck[g.i - 1].c; g.ph = 'play'; }
+  });
+}
+function soloSkip() {
+  set(s => {
+    const o = s.solo, g = o.g;
+    const item = o.deck[g.i - 1];
+    if (item) { o.used = o.used || []; o.used.push(item.id); }
+    o.deck.splice(g.i - 1, 1); o.skips += 1;
+    if (o.deck.length < g.n) g.n = o.deck.length;
+    if (g.i > g.n) { g.i = Math.max(g.n, 1); g.ph = 'end'; g.aw = computeAwards(o.hist); g.l = null; }
+    else g.l = o.deck[g.i - 1].c;
+  });
+}
+
+/* ---------- icons ---------- */
+const Icon = {
+  heart: () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21c-.3 0-.6-.1-.8-.3C7.4 17.6 2.5 13.7 2.5 9.1 2.5 6.2 4.7 4 7.5 4c1.8 0 3.4.9 4.5 2.4C13.1 4.9 14.7 4 16.5 4c2.8 0 5 2.2 5 5.1 0 4.6-4.9 8.5-8.7 11.6-.2.2-.5.3-.8.3z"/></svg>`,
+  play: () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.2v13.6c0 .8.9 1.3 1.6.9l10.6-6.8c.6-.4.6-1.3 0-1.7L9.6 4.3C8.9 3.9 8 4.4 8 5.2z"/></svg>`,
+  ext: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v4.5A1.5 1.5 0 0 1 17.5 20h-12A1.5 1.5 0 0 1 4 18.5v-12A1.5 1.5 0 0 1 5.5 5H10"/></svg>`,
+  x: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  check: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  eye: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>`,
+  mask: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c3-1.5 6-1.5 9 0 3-1.5 6-1.5 9 0 0 6-3 10-9 10S3 13 3 7z"/><path d="M7.5 10.5h2M14.5 10.5h2"/></svg>`,
+  tv: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg>`
+};
+
+/* ---------- shared pieces ---------- */
+function Avatar({ name, col, size, cls }) {
+  const c = COLORS[(col | 0) % COLORS.length];
+  return html`<span class=${'av' + (cls ? ' ' + cls : '')} style=${'--s:' + (size || 40) + 'px;--c:' + c[0] + ';--cf:' + c[1]} aria-hidden="true">${initial(name)}</span>`;
+}
+function RoundsPicker({ value, onChange }) {
+  return html`<div class="seg" role="group" aria-label="Liczba rund">${ROUNDS.map(n => html`<button type="button" key=${n} aria-pressed=${value === n} onClick=${() => onChange(n)}>${n}</button>`)}</div>`;
+}
+function Tile({ c, small, label }) {
+  if (!c) return null;
+  const h = handleOf(c);
+  return html`<a class=${'tile' + (small ? ' small' : '')} href=${expand(c)} target="_blank" rel="noopener noreferrer">
+    <span class="thumb" style=${thumbStyle(c)}><span class="play">${Icon.play()}</span></span>
+    <span class="tile-body">
+      <span class="eyebrow">${label || (h ? 'Film od' : 'Losowy lajk')}</span>
+      <span class="handle">${h || 'Film z TikToka'}</span>
+      <span class="tile-cta">Obejrzyj na TikToku ${Icon.ext()}</span>
+    </span>
+  </a>`;
+}
+function Player({ c }) {
+  const id = videoId(c);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!id) return undefined;
+    function onMsg(e) {
+      if (e.origin !== 'https://www.tiktok.com') return;
+      let d = e.data;
+      if (typeof d === 'string') { try { d = JSON.parse(d); } catch (x) { return; } }
+      if (d && d['x-tiktok-player'] && d.type === 'onPlayerError') {
+        const code = d.value && (d.value.errorCode || d.value.code);
+        if (code !== 3002) setFailed(true);
+      }
+    }
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [id]);
+  if (!id) return html`<${Tile} c=${c} />`;
+  const src = 'https://www.tiktok.com/player/v1/' + id + '?loop=1&rel=0&music_info=0&description=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=0&closed_caption=0&native_context_menu=0';
+  return html`<div class="player-wrap">
+    <div class="player"><iframe src=${src} title="Film z TikToka" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    ${failed ? html`<p class="msg err">TikTok nie pozwala odtworzyć tego filmu poza aplikacją.</p>` : null}
+    <a class="open-tt" href=${expand(c)} target="_blank" rel="noopener noreferrer">${failed ? 'Otwórz go w TikToku ↗' : 'Nie działa? Otwórz w TikToku ↗'}</a>
+  </div>`;
+}
+function RoundHead({ G }) {
+  const done = G.i - (G.ph === 'play' ? 1 : 0);
+  return html`<div class="roundhead">
+    <div class="row between"><span class="eyebrow">Runda ${G.i} z ${G.n}</span>${G.ph === 'reveal' ? html`<span class="eyebrow like">Odkryte</span>` : null}</div>
+    <div class="progress"><i style=${'width:' + Math.round(done / Math.max(1, G.n) * 100) + '%'}></i></div>
+  </div>`;
+}
+function LineupReveal({ owners }) {
+  const burst = useMemo(() => Array.from({ length: 12 }, (_, i) => {
+    const a = (i / 12) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+    const r = 80 + Math.random() * 60;
+    return { dx: Math.round(Math.cos(a) * r), dy: Math.round(Math.sin(a) * r * 0.75 - 24), rot: Math.round((Math.random() - 0.5) * 70), sc: (0.6 + Math.random() * 0.8).toFixed(2), d: (Math.random() * 0.18).toFixed(2) };
+  }), []);
+  const big = owners.length > 1 ? 82 : 104;
+  return html`<div class="lineup">
+    <div class="marks" aria-hidden="true">${[190, 180, 170, 160, 150].map(n => html`<span key=${n}>${n}</span>`)}</div>
+    <div class="suspects-row">${owners.map((o, i) => html`<${Avatar} key=${o[0]} name=${o[1]} col=${o[2]} size=${big} cls=${'pop' + (i ? ' d1' : '')} />`)}</div>
+    <div class="placard pop d1" role="status">
+      <span class="pl-k">${owners.length > 1 ? 'Wspólny lajk · polubione przez' : 'Polubione przez'}</span>
+      <strong>${joinNames(owners.map(o => o[1]))}</strong>
+    </div>
+    <div class="burst" aria-hidden="true">${burst.map((b, i) => html`<i key=${i} style=${'--dx:' + b.dx + 'px;--dy:' + b.dy + 'px;--rot:' + b.rot + 'deg;--sc:' + b.sc + ';animation-delay:' + b.d + 's'}>${Icon.heart()}</i>`)}</div>
+  </div>`;
+}
+function Scoreboard({ pl, sc, d }) {
+  const ranked = rankList(pl, sc);
+  return html`<div class="board">${ranked.map(r => html`<div class=${'brow' + (r.x[0] === S.me.key ? ' me' : '')} key=${r.x[0]}>
+    <span class="rank">${r.rank}.</span>
+    <${Avatar} name=${r.x[1]} col=${r.x[2]} size=${32} />
+    <span class="bname">${r.x[1]}</span>
+    <span class="bscore">${d && d[r.x[0]] ? html`<span class="delta">+${fmt(d[r.x[0]])}</span>` : null}${fmt(r.s)}</span>
+  </div>`)}</div>`;
+}
+function Podium({ ranked }) {
+  const top = ranked.slice(0, 3);
+  if (!top.length) return null;
+  const order = top.length === 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : [top[0]];
+  return html`<div class="podium" style=${'--n:' + order.length}>${order.map(r => {
+    const c = COLORS[r.x[2] % COLORS.length];
+    return html`<div class=${'pod r' + Math.min(r.rank, 3)} key=${r.x[0]}>
+      <${Avatar} name=${r.x[1]} col=${r.x[2]} size=${48} />
+      <span class="nm">${r.x[1]}</span>
+      <span class="sc">${fmt(r.s)} pkt</span>
+      <div class="bar" style=${'--c:' + c[0] + ';--cf:' + c[1]}>${r.rank}</div>
+    </div>`;
+  })}</div>`;
+}
+function Awards({ G }) {
+  const by = keyMap(G.pl);
+  const items = (G.aw || []).map(a => {
+    if (a.t === 'det' && by[a.k]) return { k: 'Detektyw wieczoru', v: by[a.k][1] + ' · ' + a.n + ' ' + plural(a.n, 'trafienie', 'trafienia', 'trafień'), ico: Icon.eye() };
+    if (a.t === 'cam' && by[a.k]) return { k: 'Mistrz kamuflażu', v: by[a.k][1] + ' · ' + a.n + ' ' + plural(a.n, 'zmylona osoba', 'zmylone osoby', 'zmylonych osób'), ico: Icon.mask() };
+    if (a.t === 'hard' && a.l) return { k: 'Najtrudniejszy TikTok', v: 'Lajk: ' + joinNames(a.o.map(k => by[k] && by[k][1]).filter(Boolean)) + ' · pudła: ' + a.n + ' z ' + a.m, ico: Icon.heart(), l: a.l };
+    return null;
+  }).filter(Boolean);
+  if (!items.length) return null;
+  return html`<div class="awards">${items.map(it => html`<div class="award" key=${it.k}>
+    <span class="aw-ico">${it.ico}</span>
+    <div class="meta"><span class="aw-k">${it.k}</span><span class="aw-v">${it.v}</span>${it.l ? html`<a class="small" href=${expand(it.l)} target="_blank" rel="noopener noreferrer">Obejrzyj jeszcze raz</a>` : null}</div>
+  </div>`)}</div>`;
+}
+function End({ G, primary, secondary }) {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const ranked = rankList(G.pl, G.sc);
+  const top = ranked.filter(r => r.rank === 1);
+  const title = top.length > 1 ? 'Remis: ' + joinNames(top.map(r => r.x[1])) : top[0] ? 'Wygrywa ' + top[0].x[1] : 'Koniec gry';
+  return html`<section class="stack-lg">
+    <div class="section center"><span class="eyebrow like">Koniec gry</span><h1 class="h1">${title}</h1></div>
+    <${Podium} ranked=${ranked} />
+    <${Awards} G=${G} />
+    <div class="section"><h2 class="h3">Pełne wyniki</h2><${Scoreboard} pl=${G.pl} sc=${G.sc} /></div>
+    <div class="dock">${primary}${secondary}</div>
+  </section>`;
+}
+const STATE_LABEL = { ok: '▶ w grze', wait: 'sprawdzam…', out: '↗ w TikToku' };
+function LinkAdder({ idp, links, onChange }) {
+  const [val, setVal] = useState('');
+  const [msg, setMsg] = useState(null);
+  const [busy, setBusy] = useState(false);
+  function addText(text) {
+    const found = extractLinks(text);
+    if (!found.length) { setMsg({ k: 'err', t: 'Nie widzę tu linku do TikToka. W TikToku dotknij Udostępnij, potem Kopiuj link.' }); return false; }
+    const r = mergeLinks(links, found);
+    onChange(r.list);
+    if (r.added) setMsg({ k: 'ok', t: 'Dodano ' + nTik(r.added) + '.' + (r.dup ? ' Pominięte powtórki: ' + r.dup + '.' : '') + (r.cut ? ' Limit to ' + MAX_LINKS + '.' : '') });
+    else setMsg({ k: 'err', t: r.cut ? 'Masz już ' + MAX_LINKS + ' TikToków. To wystarczy.' : 'Ten TikTok już jest na liście.' });
+    return true;
+  }
+  function onPaste(e) {
+    const t = (e.clipboardData && e.clipboardData.getData('text')) || '';
+    if (extractLinks(t).length) { e.preventDefault(); addText(t); setVal(''); }
+  }
+  function onSubmit(e) { e.preventDefault(); if (val.trim() && addText(val)) setVal(''); }
+  async function onFile(e) {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    setBusy(true); setMsg({ k: 'info', t: 'Czytam plik…' });
+    try {
+      const all = await importFile(f);
+      if (all === null) setMsg({ k: 'err', t: 'Nie widzę w tym pliku listy polubionych. Wgraj eksport danych TikToka w formacie JSON (może być spakowany w .zip) albo wklej linki.' });
+      else if (!all.length) setMsg({ k: 'err', t: 'Lista polubionych w tym pliku jest pusta.' });
+      else {
+        const room = Math.max(0, MAX_LINKS - links.length);
+        const r = mergeLinks(links, shuffle(all.slice()).slice(0, room));
+        onChange(r.list);
+        setMsg({ k: 'ok', t: 'W pliku: ' + fmt(all.length) + ' ' + plural(all.length, 'polubiony film', 'polubione filmy', 'polubionych filmów') + '. Do gry trafia ' + r.added + ' losowych.' });
+      }
+    } catch (err) {
+      setMsg({ k: 'err', t: err && err.message === 'zip' ? 'Nie udało się otworzyć pliku .zip. Rozpakuj go i wgraj plik .json ze środka.' : 'Nie udało się odczytać pliku. Spróbuj z plikiem .json z eksportu danych TikToka.' });
+    } finally { setBusy(false); }
+  }
+  const outCount = links.filter(c => linkState(c) === 'out').length;
+  return html`<div class="stack">
+    <form class="row" onSubmit=${onSubmit} novalidate>
+      <label class="sr-only" for=${idp + '-link'}>Link do TikToka</label>
+      <input id=${idp + '-link'} class="input grow" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck=${false} enterkeyhint="done" placeholder="Wklej link do TikToka" value=${val} onInput=${e => setVal(e.target.value)} onPaste=${onPaste} />
+      <button class="btn btn-secondary w-auto" type="submit">Dodaj</button>
+    </form>
+    ${msg ? html`<p class=${'msg ' + msg.k} role="status">${msg.t}</p>` : null}
+    ${links.length ? html`<div class="links">${links.map(c => { const st = linkState(c); return html`<div class="link" key=${c}>
+      <span class="t">${describe(c)}</span>
+      <span class=${'lstate ' + st}>${STATE_LABEL[st]}</span>
+      <button class="x" type="button" aria-label=${'Usuń ' + describe(c)} onClick=${() => onChange(links.filter(x => x !== c))}>${Icon.x()}</button>
+    </div>`; })}</div>` : null}
+    ${outCount ? html`<p class="small muted">Oznaczone „↗ w TikToku” nie dały się zamienić na film w grze, więc w rundzie otworzą się w aplikacji TikToka.</p>` : null}
+    <div class="filebox">
+      <label class=${'btn btn-secondary' + (busy ? ' busy' : '')} for=${idp + '-file'}>${busy ? 'Czytam plik…' : 'Wgraj plik z danymi TikToka'}</label>
+      <input id=${idp + '-file'} class="sr-only" type="file" accept=".zip,.json,.txt,application/zip,application/json,text/plain" onChange=${onFile} disabled=${busy} />
+      <details class="how">
+        <summary>Jak zdobyć ten plik?</summary>
+        <ol>
+          <li>W TikToku: Profil → ☰ → Ustawienia i prywatność → Konto → Pobierz swoje dane.</li>
+          <li>Wybierz format JSON i poproś o dane.</li>
+          <li>Gdy plik będzie gotowy (czasem od razu, czasem po kilku dniach), pobierz go i wgraj tutaj. Gra wylosuje ${MAX_LINKS} filmów z całej Twojej historii polubień.</li>
+        </ol>
+      </details>
+    </div>
+  </div>`;
+}
+const HOW_TO_COPY = 'W TikToku: Profil → zakładka z serduszkiem → otwórz film → Udostępnij → Kopiuj link. Wklej tutaj, możesz też kilka naraz.';
+
+/* ---------- screens ---------- */
+function TopBar() {
+  const [ask, setAsk] = useState(false);
+  const inGame = S.mode !== 'home';
+  return html`<header class="top">
+      <span class="brand">${Icon.heart()}<span>Czyj to lajk?</span></span>
+      <div class="top-right">
+        ${S.mode === 'multi' && S.code ? html`<span class="chip" aria-label=${'Kod gry ' + S.code + (S.connected ? ', połączono' : ', brak połączenia')}><span class=${'dot' + (S.connected ? '' : ' off')}></span>${S.code}</span>` : null}
+        ${S.mode === 'solo' ? html`<span class="chip">Jeden telefon</span>` : null}
+        ${inGame ? html`<button class="chip" type="button" aria-expanded=${ask} onClick=${() => setAsk(!ask)}>Wyjdź</button>` : null}
+      </div>
+    </header>
+    ${inGame && ask ? html`<div class="confirm">
+      <p>${S.mode === 'multi' && S.isHost ? 'Prowadzisz tę grę. Gdy wyjdziesz, zatrzyma się dla wszystkich.' : 'Na pewno wyjść z gry?'}</p>
+      <div class="row"><button class="btn btn-secondary grow" type="button" onClick=${() => setAsk(false)}>Zostaję</button><button class="btn btn-secondary danger grow" type="button" onClick=${() => { setAsk(false); leaveGame(); }}>Wyjdź</button></div>
+    </div>` : null}`;
+}
+function HeroArt() {
+  return html`<div class="lineup hero-lineup" aria-hidden="true">
+    <div class="marks"><span>190</span><span>180</span><span>170</span><span>160</span></div>
+    <div class="suspects-row">
+      <${Avatar} name="O" col=${1} size=${58} />
+      <span class="mid"><span class="bubble">${Icon.heart()}<b>?</b></span><${Avatar} name="K" col=${4} size=${72} /></span>
+      <${Avatar} name="Z" col=${2} size=${58} />
+    </div>
+  </div>`;
+}
+function Home() {
+  const [name, setName] = useState(S.me.name || '');
+  const [code, setCode] = useState(S.hashCode || '');
+  const [err, setErr] = useState(null);
+  const status = S.roomStatus;
+  function needName() {
+    const n = cleanName(name);
+    if (!n) { setErr('name'); const el = document.getElementById('name'); if (el) el.focus(); return null; }
+    setErr(null);
+    S.me.name = n; persist();
+    return n;
+  }
+  async function onCreate(e) {
+    e.preventDefault();
+    const n = needName(); if (!n) return;
+    if (!(await roomReady)) { toast('Brak połączenia z serwerem gry. Odśwież stronę.'); return; }
+    createGame(n);
+  }
+  async function onJoin(e) {
+    e.preventDefault();
+    const n = needName(); if (!n) return;
+    const c = code.toUpperCase().replace(/[^A-Z]/g, '');
+    if (c.length !== 4) { setErr('code'); return; }
+    if (!(await roomReady)) { toast('Brak połączenia z serwerem gry. Odśwież stronę.'); return; }
+    joinGame(n, c);
+  }
+  const invited = S.hashCode && code === S.hashCode;
+  return html`<section class="stack-lg">
+    <div class="hero">
+      <h1 class="wordmark">Czyj to<br/>lajk<span class="q">?</span></h1>
+      <p class="lead">${invited ? 'Znajomi zapraszają Cię do gry. Wpisz imię i dołącz.' : 'Każdy wrzuca swoje polubione TikToki. Gra losuje jednego, a Wy zgadujecie, kto go polubił.'}</p>
+      ${invited ? null : html`<${HeroArt} />`}
+    </div>
+    ${S.homeNotice ? html`<div class="note warn" role="status">${S.homeNotice}</div>` : null}
+    ${status === 'unavailable' ? html`<div class="note warn"><strong>Nie da się teraz połączyć telefonów.</strong><span>Nie wczytało się połączenie z serwerem gry. Odśwież stronę albo zagrajcie na jednym telefonie.</span></div>` : null}
+    <div class="field">
+      <label class="label" for="name">Twoje imię</label>
+      <input id="name" class="input" value=${name} onInput=${e => { setName(e.target.value); if (err === 'name') setErr(null); }} maxlength="24" autocomplete="nickname" enterkeyhint="done" placeholder="np. Ola" />
+      ${err === 'name' ? html`<p class="msg err">Wpisz imię, żeby inni wiedzieli, na kogo typować.</p>` : null}
+    </div>
+    ${invited ? html`
+      <form class="section" onSubmit=${onJoin} novalidate>
+        <button class="btn btn-primary" type="submit" disabled=${status === 'unavailable'}>Dołącz do gry ${code}</button>
+        <button class="btn btn-quiet" type="button" onClick=${() => { S.hashCode = null; setCode(''); rerender(); }}>Mam inny kod albo chcę założyć grę</button>
+      </form>` : html`
+      <form class="stack" onSubmit=${onCreate} novalidate>
+        <button class="btn btn-primary" type="submit" disabled=${status === 'unavailable'}>Załóż grę</button>
+      </form>
+      <form class="section" onSubmit=${onJoin} novalidate>
+        <label class="label" for="code">Masz kod od znajomych?</label>
+        <div class="row join-row">
+          <input id="code" class="input code-input" value=${code} onInput=${e => { setCode(e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4)); if (err === 'code') setErr(null); }} maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck=${false} enterkeyhint="go" placeholder="KOD" />
+          <button class="btn btn-secondary" type="submit" disabled=${status === 'unavailable'}>Dołącz</button>
+        </div>
+        ${err === 'code' ? html`<p class="msg err">Kod ma 4 litery, np. KOTA.</p>` : null}
+      </form>`}
+    <div class="or">albo</div>
+    <div class="section">
+      <button class="btn btn-secondary" type="button" onClick=${() => { const n = cleanName(name); if (n) { S.me.name = n; } soloInit(); }}>Gramy na jednym telefonie</button>
+      <p class="small muted">Bez łączenia telefonów: podajecie sobie jeden telefon i typujecie na głos.</p>
+    </div>
+    <div class="section">
+      <h2 class="h3">Jak to działa</h2>
+      <ol class="steps">
+        <li>Załóż grę i pokaż znajomym kod QR albo wyślij im link.</li>
+        <li>Każdy wkleja linki do kilku TikToków, które polubił.</li>
+        <li>Gra puszcza losowego TikToka, a każdy na swoim telefonie typuje, kto go polubił.</li>
+        <li>Za trafienie +${GUESS} pkt. Za każdą osobę zmyloną Twoim lajkiem +${FOOL} pkt.</li>
+      </ol>
+    </div>
+  </section>`;
+}
+function Banners() {
+  const out = [];
+  const off = S.discSince ? Date.now() - S.discSince : 0;
+  if (!S.connected && off > 12000) out.push(html`<div class="banner" key="conn" role="status">Nie mogę połączyć się z serwerem gry. Sprawdź internet albo zagrajcie na jednym telefonie.</div>`);
+  else if (!S.connected && off > 2000) out.push(html`<div class="banner" key="conn" role="status">Łączę z serwerem gry…</div>`);
+  if (!S.isHost && S.hostAway && S.lastG) out.push(html`<div class="banner" key="host" role="status">Prowadzący jest chwilowo offline. Twoje typy się zapiszą.</div>`);
+  return out;
+}
+function Multi() {
+  const G = currentG();
+  if (!G) return html`${Banners()}<${Searching} />`;
+  let view;
+  if (G.ph === 'lobby') view = html`<${Lobby} G=${G} />`;
+  else if (G.ph === 'play') view = html`<${Round} key=${'p' + G.r} G=${G} />`;
+  else if (G.ph === 'reveal') view = html`<${Reveal} key=${'r' + G.r} G=${G} />`;
+  else view = html`<${End} G=${G}
+      primary=${S.isHost ? html`<button class="btn btn-primary" type="button" onClick=${hostToLobby}>Zagrajmy jeszcze raz</button>` : html`<p class="waiting">Prowadzący może zacząć nową grę</p>`}
+      secondary=${html`<button class="btn btn-quiet" type="button" onClick=${leaveGame}>Wyjdź z gry</button>`} />`;
+  return html`${Banners()}${view}`;
+}
+function Searching() {
+  useEffect(() => { const t = setTimeout(rerender, 6200); return () => clearTimeout(t); }, []);
+  const notFound = Date.now() - (S.searchStart || Date.now()) > 6000;
+  return html`<section class="stack-lg">
+    <div class="section">
+      <span class="eyebrow">Kod ${S.code}</span>
+      <h1 class="h1">${notFound ? 'Nie widzę tej gry' : 'Szukam gry…'}</h1>
+      <p class="muted">${notFound ? 'Sprawdź, czy kod ' + S.code + ' się zgadza. Gra pojawi się, gdy prowadzący ma ją otwartą na swoim telefonie.' : 'Łączę z telefonem prowadzącego.'}</p>
+    </div>
+    ${notFound ? null : html`<p class="waiting">Łączę…</p>`}
+    <button class="btn btn-secondary" type="button" onClick=${leaveGame}>Zmień kod</button>
+  </section>`;
+}
+function ShareJoin({ code }) {
+  const link = joinLink(code);
+  const svg = useMemo(() => qrSvg(link), [link]);
+  return html`<div class="share">
+    ${svg ? html`<div class="qr" role="img" aria-label="Kod QR z linkiem do gry" dangerouslySetInnerHTML=${{ __html: svg }}></div>` : null}
+    <div class="share-txt">
+      <p class="small muted">Znajomi skanują kod aparatem albo otwierają link. Konto nie jest potrzebne.</p>
+      <button class="btn btn-secondary" type="button" onClick=${() => shareJoin(code)}>${navigator.share ? 'Wyślij link' : 'Kopiuj link'}</button>
+    </div>
+  </div>`;
+}
+function Lobby({ G }) {
+  const players = lobbyPlayers();
+  const ready = players.filter(p => p.links.length).length;
+  return html`<section class="stack-lg">
+    <div class="section">
+      <span class="eyebrow">Kod gry</span>
+      <div class="code-row">
+        <div class="code" aria-label=${'Kod gry: ' + S.code.split('').join(' ')}>${S.code.split('').map((ch, i) => html`<span key=${i}>${ch}</span>`)}</div>
+      </div>
+      <${ShareJoin} code=${S.code} />
+    </div>
+    <div class="section">
+      <h2 class="h2">Gracze · ${players.length}</h2>
+      <div class="plist">${players.map((p, i) => html`<div class="prow" key=${p.key}>
+        <${Avatar} name=${p.name} col=${i % COLORS.length} />
+        <div class="meta"><span class="nm">${p.name}${p.me ? ' (Ty)' : ''}</span><span class=${'sub' + (p.links.length ? ' okc' : '')}>${p.links.length ? nTik(p.links.length) : 'jeszcze bez TikToków'}</span></div>
+        ${p.hostTag ? html`<span class="tag">prowadzi</span>` : null}
+      </div>`)}</div>
+      <details class="how"><summary>Ktoś nie widzi gry?</summary><ol>
+        <li>Każdy musi mieć internet i otwartą tę stronę z tym samym kodem.</li>
+        <li>Gra łączy telefony przez darmowy, publiczny serwer, więc wpisujcie tylko imiona i linki do TikToków.</li>
+        <li>Jeśli połączenie nie działa, wyjdź i wybierz grę na jednym telefonie.</li>
+      </ol></details>
+    </div>
+    <div class="section">
+      <h2 class="h2">Twoje polubione TikToki</h2>
+      <p class="small muted">${HOW_TO_COPY}</p>
+      <${LinkAdder} idp="me" links=${S.me.links} onChange=${list => set(s => { s.me.links = list; })} />
+      <p class="small muted">Do gry trafia najwyżej ${MAX_LINKS} Twoich TikToków.</p>
+    </div>
+    ${S.isHost ? html`<div class="section">
+      <span class="label">Liczba rund</span>
+      <${RoundsPicker} value=${S.host.rounds} onChange=${n => { S.host.rounds = n; S.host.g.n = n; commitHost(); }} />
+      <span class="label">Gdzie lecą filmy</span>
+      <div class="seg words" style="--cols:2" role="group" aria-label="Gdzie lecą filmy">
+        <button type="button" aria-pressed=${!S.host.tv} onClick=${() => { S.host.tv = false; S.host.g.tv = false; commitHost(); }}>Na każdym telefonie</button>
+        <button type="button" aria-pressed=${!!S.host.tv} onClick=${() => { S.host.tv = true; S.host.g.tv = true; commitHost(); }}>Tylko u mnie</button>
+      </div>
+    </div>` : html`<p class="small muted">Rundy: ${G.n || 10}. ${G.tv ? 'Filmy lecą na telefonie prowadzącego.' : 'Filmy lecą na każdym telefonie.'} Prowadzący zaczyna grę, gdy wszyscy są gotowi.</p>`}
+    <div class="dock">
+      ${S.isHost ? html`
+        <button class="btn btn-primary" type="button" disabled=${ready < 2} onClick=${hostStart}>Zaczynamy</button>
+        <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : 'Z TikTokami: ' + nOsob(ready) + '.'}</p>` : html`<p class="waiting">Czekamy, aż prowadzący zacznie</p>`}
+    </div>
+  </section>`;
+}
+function VoteStatus({ pl, voted, present }) {
+  const list = pl.filter(x => present.has(x[0]));
+  const done = list.filter(x => voted.has(x[0])).length;
+  return html`<div class="votestatus">
+    <div class="voters">${list.map(x => html`<span class=${'voter' + (voted.has(x[0]) ? ' done' : '')} key=${x[0]} title=${x[1]}><${Avatar} name=${x[1]} col=${x[2]} size=${30} /></span>`)}</div>
+    <span class="small muted">Typy: ${done} z ${list.length}</span>
+  </div>`;
+}
+function HostRoundControls() {
+  const [ask, setAsk] = useState(false);
+  return html`<div class="dock">
+    <button class="btn btn-secondary" type="button" onClick=${doReveal}>Odkryj teraz</button>
+    ${ask ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setAsk(false)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { setAsk(false); hostSkip(); }}>Tak, pomiń</button></div>`
+      : html`<button class="btn btn-quiet" type="button" onClick=${() => setAsk(true)}>Film nie działa? Pomiń</button>`}
+  </div>`;
+}
+function Round({ G }) {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const me = S.me.key;
+  const inGame = G.pl.some(x => x[0] === me);
+  const opts = G.pl.filter(x => x[0] !== me);
+  const mine = S.myVote && S.myVote.r === G.r ? S.myVote.k : null;
+  const players = lobbyPlayers();
+  const present = new Set(players.map(p => p.key));
+  const voted = new Set(players.filter(p => p.vote && p.vote.r === G.r).map(p => p.key));
+  if (S.isHost && S.host.vc && S.host.vc.r === G.r) for (const k in S.host.vc.m) voted.add(k);
+  const showVideo = !G.tv || S.isHost;
+  return html`<section class="stack">
+    <${RoundHead} G=${G} />
+    ${showVideo ? html`<${Player} c=${G.l} />` : html`<div class="tvnote">${Icon.tv()}<span>Film leci na telefonie prowadzącego. Oglądajcie razem i typujcie tutaj.</span></div>`}
+    <div class="section">
+      <h2 class="h2">Kto to polubił?</h2>
+      ${!inGame ? html`<p class="note">Dołączasz do gry. Za chwilę zobaczysz, na kogo możesz typować.</p>`
+        : opts.length ? html`<div class="suspects">${opts.map(x => html`<button key=${x[0]} type="button" class="suspect" aria-pressed=${mine === x[0]} onClick=${() => castVote(G, x[0])}>
+            <${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span>${mine === x[0] ? html`<span class="tick">${Icon.check()}</span>` : null}
+          </button>`)}</div>`
+        : html`<p class="muted">Brakuje innych graczy.</p>`}
+      <p class="small muted">${mine ? 'Typ zapisany. Możesz go zmienić do odkrycia.' : 'Jeśli to Twój lajk, wskaż kogoś innego, żeby zmylić resztę.'}</p>
+    </div>
+    <${VoteStatus} pl=${G.pl} voted=${voted} present=${present} />
+    ${S.isHost ? html`<${HostRoundControls} />` : null}
+  </section>`;
+}
+function Outcome({ kind, pts, guess }) {
+  if (kind === 'ok') return html`<div class="outcome ok"><strong>Trafienie!</strong><span>+${pts} pkt</span></div>`;
+  if (kind === 'no') return html`<div class="outcome no"><strong>Pudło</strong><span>Twój typ: ${guess ? guess[1] : '—'}</span></div>`;
+  if (kind === 'own') return html`<div class="outcome own"><strong>To Twój lajk</strong><span>${pts ? 'Zmylone: ' + nOsob(pts / FOOL) + ' · +' + pts + ' pkt' : 'Tym razem nikt się nie dał zmylić.'}</span></div>`;
+  return html`<div class="outcome"><strong>Bez typu</strong><span class="muted">W tej rundzie nie zagłosowano.</span></div>`;
+}
+function VoteResults({ G }) {
+  const rv = G.rv, by = keyMap(G.pl);
+  return html`<div class="results">${G.pl.map(x => {
+    const t = rv.vt[x[0]], own = rv.o.includes(x[0]), ok = !own && t && rv.o.includes(t);
+    const cls = own ? 'own' : t ? (ok ? 'ok' : 'no') : 'none';
+    const pts = rv.d[x[0]] || 0;
+    return html`<div class=${'res ' + cls} key=${x[0]}>
+      <${Avatar} name=${x[1]} col=${x[2]} size=${30} />
+      <span class="res-txt"><b>${x[1]}</b>${t && by[t] ? html`<span class="arrow"> → </span>${by[t][1]}` : html` <span class="muted">bez typu</span>`}${own ? html`<span class="mark own">${t ? 'blef' : 'lajk'}</span>` : t ? html`<span class=${'mark ' + (ok ? 'ok' : 'no')}>${ok ? '✓' : '✗'}</span>` : null}</span>
+      <span class="pts">${pts ? '+' + fmt(pts) : '0'}</span>
+    </div>`;
+  })}</div>`;
+}
+function Reveal({ G }) {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const rv = G.rv, by = keyMap(G.pl), me = S.me.key;
+  const owners = rv.o.map(k => by[k]).filter(Boolean);
+  const g = rv.vt[me];
+  const kind = rv.o.includes(me) ? 'own' : g ? (rv.o.includes(g) ? 'ok' : 'no') : 'none';
+  return html`<section class="stack">
+    <${RoundHead} G=${G} />
+    <${LineupReveal} owners=${owners} />
+    ${by[me] ? html`<${Outcome} kind=${kind} pts=${rv.d[me] || 0} guess=${by[g]} />` : null}
+    <div class="section"><h2 class="h3">Kto jak typował</h2><${VoteResults} G=${G} /></div>
+    <div class="section"><h2 class="h3">Wyniki po ${G.i}. rundzie</h2><${Scoreboard} pl=${G.pl} sc=${G.sc} d=${rv.d} /></div>
+    <div class="dock">${S.isHost
+      ? html`<button class="btn btn-primary" type="button" onClick=${hostNext}>${G.i >= G.n ? 'Pokaż wyniki końcowe' : 'Następna runda'}</button>`
+      : html`<p class="waiting">Prowadzący zaraz przełączy dalej</p>`}</div>
+  </section>`;
+}
+
+function Solo() {
+  const so = S.solo, g = so.g;
+  if (g.ph === 'play') return html`<${SoloRound} key=${'p' + g.gid + g.i + '.' + so.skips} />`;
+  if (g.ph === 'reveal') return html`<${SoloReveal} key=${'r' + g.gid + g.i} />`;
+  if (g.ph === 'end') return html`<${End} G=${g}
+    primary=${html`<button class="btn btn-primary" type="button" onClick=${() => set(s => { s.solo.g = { ph: 'setup' }; })}>Zagrajcie jeszcze raz</button>`}
+    secondary=${html`<button class="btn btn-quiet" type="button" onClick=${leaveGame}>Wyjdź</button>`} />`;
+  return html`<${SoloSetup} />`;
+}
+function SoloSetup() {
+  const so = S.solo;
+  const [name, setName] = useState('');
+  const [open, setOpen] = useState(null);
+  const [del, setDel] = useState(null);
+  const ready = so.players.filter(p => p.links.length).length;
+  function add(e) {
+    e.preventDefault();
+    const n = cleanName(name);
+    if (!n) return;
+    if (so.players.length >= MAX_PLAYERS) { toast('Maksymalnie ' + MAX_PLAYERS + ' graczy.'); return; }
+    const key = 'p' + rid(9);
+    set(s => { s.solo.players.push({ key, name: n, links: [] }); });
+    setName(''); setOpen(key);
+  }
+  return html`<section class="stack-lg">
+    <div class="section">
+      <span class="eyebrow">Gra na jednym telefonie</span>
+      <h1 class="h1">Kto gra?</h1>
+      <p class="muted">Podawajcie sobie telefon. Każdy dodaje swoje TikToki, kiedy reszta nie patrzy, i zwija swoją kartę.</p>
+    </div>
+    <form class="row" onSubmit=${add} novalidate>
+      <label class="sr-only" for="solo-name">Imię gracza</label>
+      <input id="solo-name" class="input grow" value=${name} onInput=${e => setName(e.target.value)} maxlength="24" autocomplete="off" enterkeyhint="done" placeholder="Imię gracza" />
+      <button class="btn btn-secondary w-auto" type="submit">Dodaj</button>
+    </form>
+    ${so.players.length ? html`<div class="plist">${so.players.map((p, i) => html`<div class="pcard" key=${p.key}>
+      <div class="prow">
+        <${Avatar} name=${p.name} col=${i % COLORS.length} />
+        <div class="meta"><span class="nm">${p.name}</span><span class=${'sub' + (p.links.length ? ' okc' : '')}>${p.links.length ? nTik(p.links.length) : 'jeszcze bez TikToków'}</span></div>
+        <button class="btn btn-quiet" type="button" aria-expanded=${open === p.key} onClick=${() => { setOpen(open === p.key ? null : p.key); setDel(null); }}>${open === p.key ? 'Zwiń' : p.links.length ? 'Edytuj' : 'Dodaj TikToki'}</button>
+      </div>
+      ${open === p.key ? html`<div class="pcard-body">
+        <p class="small muted">${HOW_TO_COPY}</p>
+        <${LinkAdder} idp=${'solo-' + p.key} links=${p.links} onChange=${list => set(s => { const t = s.solo.players.find(x => x.key === p.key); if (t) t.links = list; })} />
+        ${del === p.key ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setDel(null)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { set(s => { s.solo.players = s.solo.players.filter(x => x.key !== p.key); }); setOpen(null); setDel(null); }}>Tak, usuń</button></div>`
+          : html`<button class="btn btn-quiet danger" type="button" onClick=${() => setDel(p.key)}>Usuń gracza</button>`}
+      </div>` : null}
+    </div>`)}</div>` : html`<p class="note">Dodaj imiona wszystkich graczy. Potem każdy wkleja swoje polubione TikToki.</p>`}
+    <div class="section">
+      <span class="label">Liczba rund</span>
+      <${RoundsPicker} value=${so.rounds} onChange=${n => set(s => { s.solo.rounds = n; })} />
+    </div>
+    <div class="dock">
+      <button class="btn btn-primary" type="button" disabled=${ready < 2} onClick=${soloStart}>Zaczynamy</button>
+      <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : 'Z TikTokami: ' + nOsob(ready) + '.'}</p>
+    </div>
+  </section>`;
+}
+function SoloRound() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const [ask, setAsk] = useState(false);
+  const g = S.solo.g;
+  return html`<section class="stack">
+    <${RoundHead} G=${g} />
+    <${Player} c=${g.l} />
+    <div class="section">
+      <h2 class="h2">Kto to polubił?</h2>
+      <p class="muted">Obejrzyjcie razem i typujcie na głos. Kto polubił, ten udaje, że nic nie wie.</p>
+    </div>
+    <div class="suspects">${g.pl.map(x => html`<div class="suspect" key=${x[0]}><${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span></div>`)}</div>
+    <div class="dock">
+      <button class="btn btn-primary" type="button" onClick=${() => set(s => { s.solo.g.ph = 'reveal'; s.solo.guessed = {}; })}>Odkryj</button>
+      ${ask ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setAsk(false)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { setAsk(false); soloSkip(); }}>Tak, pomiń</button></div>`
+        : html`<button class="btn btn-quiet" type="button" onClick=${() => setAsk(true)}>Film nie działa? Pomiń</button>`}
+    </div>
+  </section>`;
+}
+function SoloReveal() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const so = S.solo, g = so.g, item = so.deck[g.i - 1];
+  const by = keyMap(g.pl);
+  const owners = item.o.map(k => by[k]).filter(Boolean);
+  const guessers = g.pl.filter(x => !item.o.includes(x[0]));
+  const d = scoreRound(item.o, soloVotes());
+  return html`<section class="stack">
+    <${RoundHead} G=${g} />
+    <${LineupReveal} owners=${owners} />
+    <div class="section">
+      <h2 class="h3">Kto zgadł?</h2>
+      <p class="small muted">Zaznacz osoby, które trafiły. Punkty liczą się od razu.</p>
+      <div class="suspects">${guessers.map(x => html`<button type="button" class="suspect" key=${x[0]} aria-pressed=${!!so.guessed[x[0]]} onClick=${() => set(s => { s.solo.guessed[x[0]] = !s.solo.guessed[x[0]]; })}>
+        <${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span>${so.guessed[x[0]] ? html`<span class="tick">${Icon.check()}</span>` : null}
+      </button>`)}</div>
+    </div>
+    <div class="section"><h2 class="h3">Wyniki po ${g.i}. rundzie</h2><${Scoreboard} pl=${g.pl} sc=${addScores(g.sc, d)} d=${d} /></div>
+    <div class="dock"><button class="btn btn-primary" type="button" onClick=${soloNext}>${g.i >= g.n ? 'Pokaż wyniki końcowe' : 'Następna runda'}</button></div>
+  </section>`;
+}
+
+function App() {
+  let body;
+  if (S.mode === 'multi') body = html`<${Multi} />`;
+  else if (S.mode === 'solo' && S.solo) body = html`<${Solo} />`;
+  else body = html`<${Home} />`;
+  return html`<div class="wrap">
+    <${TopBar} />
+    ${body}
+    ${S.toast ? html`<div class="toast" role="status">${S.toast}</div>` : null}
+  </div>`;
+}
+
+/* ---------- boot ---------- */
+restore(LS.get(STORE));
+const hm = (location.hash || '').match(/^#([A-Za-z]{4})$/);
+if (hm) {
+  S.hashCode = hm[1].toUpperCase();
+  if (S.mode === 'multi' && S.code !== S.hashCode) { S.mode = 'home'; S.code = null; S.isHost = false; S.host = null; }
+}
+root.textContent = '';
+rerender();
+roomReady = initRelay();
+scheduleResolve();
+})();
+</script>
+</body>
+</html>
