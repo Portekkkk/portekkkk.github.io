@@ -1,0 +1,17 @@
+{
+  "name": "Czyj to lajk?",
+  "short_name": "Czyj lajk?",
+  "description": "Imprezowa gra na telefony: zgadnij, kto z Was polubił tego TikToka.",
+  "lang": "pl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDEFFA",
+  "theme_color": "#DD1258",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

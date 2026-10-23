@@ -9,6 +9,12 @@
 <meta property="og:description" content="Wrzucacie swoje polubione TikToki, a reszta zgaduje, kto co polubił.">
 <meta name="theme-color" content="#EDEFFA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F0D25" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Czyj lajk?">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23DD1258' d='M12 21c-.3 0-.6-.1-.8-.3C7.4 17.6 2.5 13.7 2.5 9.1 2.5 6.2 4.7 4 7.5 4c1.8 0 3.4.9 4.5 2.4C13.1 4.9 14.7 4 16.5 4c2.8 0 5 2.2 5 5.1 0 4.6-4.9 8.5-8.7 11.6-.2.2-.5.3-.8.3z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,6 +40,7 @@
   --shadow:0 1px 0 rgba(23,20,61,.05),0 12px 28px -18px rgba(23,20,61,.45);
   --f-display:"Unbounded","Arial Black","Helvetica Neue",system-ui,sans-serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-emoji:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
   color-scheme:light;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -81,12 +88,14 @@ h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:800;line-height:1.08;
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* top bar */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;background:var(--bg)}
-.brand{display:inline-flex;align-items:center;gap:8px;font:800 14px/1 var(--f-display);letter-spacing:-.01em;white-space:nowrap}
-.brand svg{width:20px;height:20px;color:var(--like)}
-.top-right{display:flex;align-items:center;gap:8px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:12px;background:var(--bg)}
+.brand{display:inline-flex;align-items:center;gap:8px;min-width:0;font:800 14px/1 var(--f-display);letter-spacing:-.01em;white-space:nowrap}
+.brand svg{width:20px;height:20px;flex:none;color:var(--like)}
+.top-right{display:flex;align-items:center;gap:6px}
 .chip{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;border:0;border-radius:999px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);font:800 13px/1 var(--f-body);letter-spacing:.04em;white-space:nowrap}
 button.chip{cursor:pointer}
+.chip.icon{width:34px;padding:0;justify-content:center}
+.chip.icon svg{width:18px;height:18px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
 .dot.off{background:var(--bad)}
 .confirm{display:grid;gap:12px;margin-bottom:16px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
@@ -101,6 +110,7 @@ button.chip{cursor:pointer}
 .btn-secondary.danger{color:var(--bad)}
 .btn-quiet{background:none;color:var(--muted);min-height:44px;width:auto;padding:0 10px;font-size:15px;font-weight:700}
 .btn-quiet.danger{color:var(--bad)}
+.btn-quiet.like{color:var(--like)}
 .w-auto{width:auto}
 .btn[disabled]{opacity:.42;cursor:not-allowed;box-shadow:none}
 .btn.busy{opacity:.7;pointer-events:none}
@@ -125,6 +135,9 @@ button.chip{cursor:pointer}
 .hero{display:grid;gap:18px;padding-block:6px 0}
 .wordmark{margin:0;font:800 clamp(42px,13vw,64px)/.94 var(--f-display);letter-spacing:-.035em}
 .wordmark .q{color:var(--like)}
+.install{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);font-size:14px}
+.install .grow{display:grid;gap:2px}
+.install .btn{min-height:40px;font-size:14px;padding:0 14px}
 
 /* lineup: the police height chart behind the suspects */
 .lineup{position:relative;overflow:hidden;display:grid;justify-items:center;gap:14px;padding:22px 16px 18px 48px;border-radius:22px;background-color:var(--surface-2);background-image:repeating-linear-gradient(to bottom,transparent 0 22px,var(--line) 22px 24px)}
@@ -141,6 +154,11 @@ button.chip{cursor:pointer}
 
 /* avatar */
 .av{width:var(--s,40px);height:var(--s,40px);flex:none;display:inline-grid;place-items:center;border-radius:50%;background:var(--c);color:var(--cf);font:800 calc(var(--s,40px) * .42)/1 var(--f-display);box-shadow:0 0 0 2px var(--surface)}
+.av.emo{font:400 calc(var(--s,40px) * .56)/1 var(--f-emoji)}
+.avpick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.avpick button{appearance:none;aspect-ratio:1;min-height:44px;border:0;border-radius:14px;background:var(--surface-2);font:400 24px/1 var(--f-emoji);cursor:pointer}
+.avpick button[aria-pressed="true"]{background:var(--like-soft);box-shadow:inset 0 0 0 2.5px var(--like)}
+.editor{display:grid;gap:12px;padding:4px 12px 14px}
 
 /* tiktok player and fallback tile */
 .player-wrap{display:grid;justify-items:center;gap:8px}
@@ -159,12 +177,6 @@ button.chip{cursor:pointer}
 .handle{font:800 17px/1.2 var(--f-display);letter-spacing:-.01em;overflow-wrap:anywhere}
 .tile-cta{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;background:var(--btn);color:var(--on-like);font:800 15px/1.1 var(--f-body)}
 .tile-cta svg{width:16px;height:16px}
-.tile.small{padding:10px}
-.tile.small .thumb{width:54px;border-radius:10px}
-.tile.small .play{width:30px;height:30px}
-.tile.small .play svg{width:14px;height:14px;margin-left:2px}
-.tile.small .handle{font-size:15px}
-.tile.small .tile-cta{min-height:38px;font-size:14px}
 
 /* suspects grid */
 .suspects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -177,16 +189,27 @@ button.suspect:active{transform:scale(.97)}
 .suspect .tick svg{width:14px;height:14px}
 div.suspect{cursor:default}
 .votestatus{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.waitbox{display:grid;gap:12px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
-.waitlist{display:grid;gap:6px}
-.wl{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 4px 4px 8px;border-radius:12px;background:var(--surface-2)}
-.wl .btn-quiet{min-height:36px;font-size:14px}
-.wl-st{flex:none;padding:5px 8px;border-radius:7px;background:var(--surface);color:var(--muted);font:800 11px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase}
-.wl-st.off{background:var(--bad-soft);color:var(--bad)}
 .voters{display:flex;flex-wrap:wrap;gap:6px}
 .voter{position:relative;opacity:.38;transition:opacity .2s}
 .voter.done{opacity:1}
 .voter.done::after{content:"";position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--bg)}
+.waitbox{display:grid;gap:12px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+.waitlist{display:grid;gap:6px}
+.wl{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 4px 4px 8px;border-radius:12px;background:var(--surface-2)}
+.wl .btn-quiet{min-height:36px;font-size:14px;padding:0 8px}
+.wl-st{flex:none;padding:5px 8px;border-radius:7px;background:var(--surface);color:var(--muted);font:800 11px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase}
+.wl-st.off{background:var(--bad-soft);color:var(--bad)}
+.spot{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-radius:16px;background:var(--pop);color:#1A1033;font:800 16px/1.2 var(--f-body);text-align:center;animation:nudge 1.6s ease-in-out infinite}
+
+/* reactions */
+.reacts{display:flex;justify-content:space-between;gap:6px;padding:6px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow)}
+.rx{appearance:none;flex:1;min-width:0;height:46px;border:0;border-radius:999px;background:none;font:400 24px/1 var(--f-emoji);cursor:pointer;transition:transform .1s ease}
+.rx:active{transform:scale(1.35)}
+#fx{position:fixed;inset:0;z-index:35;overflow:hidden;pointer-events:none}
+.fx-e{position:absolute;bottom:-60px;display:grid;justify-items:center;gap:2px;animation:rise 2.6s cubic-bezier(.2,.6,.3,1) forwards}
+.fx-e span{font:400 46px/1 var(--f-emoji);filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.fx-e small{padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font:800 11px/1.3 var(--f-body);white-space:nowrap}
+.confetti{position:fixed;inset:0;width:100%;height:100%;z-index:36;pointer-events:none}
 
 /* round */
 .roundhead{display:grid;gap:8px}
@@ -222,10 +245,14 @@ div.suspect{cursor:default}
 .brow{display:grid;grid-template-columns:26px auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 12px;border-radius:14px}
 .brow:nth-child(odd){background:var(--surface)}
 .rank{font:800 13px/1 var(--f-display);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
-.bname{min-width:0;font-weight:800;overflow-wrap:anywhere}
+.bname{display:flex;align-items:center;gap:6px;min-width:0;font-weight:800;overflow-wrap:anywhere}
 .brow.me .bname{color:var(--like)}
 .bscore{display:flex;align-items:baseline;gap:8px;font:800 16px/1 var(--f-display);font-variant-numeric:tabular-nums}
 .delta{font:800 13px/1 var(--f-body);color:var(--ok)}
+.mv{flex:none;font:800 11px/1 var(--f-body);padding:3px 5px;border-radius:6px}
+.mv.up{background:var(--ok-soft);color:var(--ok)}
+.mv.down{background:var(--bad-soft);color:var(--bad)}
+.wins{font:400 13px/1 var(--f-emoji);letter-spacing:-1px}
 
 /* lobby */
 .code-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -296,6 +323,14 @@ details.how ol{display:grid;gap:6px;margin:6px 0 0;padding-left:20px}
 .aw-v{font-weight:800;overflow-wrap:anywhere}
 .aw-ico{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:var(--like-soft);color:var(--like)}
 .aw-ico svg{width:22px;height:22px}
+.recap{display:grid;gap:8px}
+.rc{display:grid;gap:10px;padding:10px 12px;border-radius:16px;background:var(--surface)}
+.rc-top{display:flex;align-items:center;gap:10px}
+.rc-n{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--surface-2);font:800 12px/1 var(--f-display);color:var(--muted)}
+.rc-txt{flex:1;min-width:0;display:grid;gap:2px;font-size:14px}
+.rc-txt b{font-weight:800;overflow-wrap:anywhere}
+.rc-play{flex:none;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:12px;background:var(--btn);color:var(--on-like);cursor:pointer}
+.rc-play svg{width:16px;height:16px;margin-left:2px}
 
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;max-width:calc(100% - 32px);transform:translateX(-50%);padding:12px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font:700 14px/1.3 var(--f-body);text-align:center;box-shadow:var(--shadow)}
 
@@ -309,15 +344,19 @@ details.how ol{display:grid;gap:6px;margin:6px 0 0;padding-left:20px}
 @keyframes pop{0%{transform:translateY(14px) scale(.8);opacity:.3}100%{transform:none;opacity:1}}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(4deg)}}
 @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}10%{opacity:1;transform:translateY(-12vh) scale(1.1)}80%{opacity:1}100%{transform:translateY(-78vh) translateX(var(--sway,0px)) scale(1);opacity:0}}
+@keyframes nudge{0%,100%{transform:none}10%,30%{transform:rotate(-1.5deg)}20%,40%{transform:rotate(1.5deg)}50%{transform:none}}
 @media (prefers-reduced-motion: reduce){
   .burst{display:none}
-  .pop,.bubble,.waiting::before{animation:none}
-  .btn,.tile,.suspect,.progress i,.voter{transition:none}
+  .pop,.bubble,.waiting::before,.spot{animation:none}
+  .fx-e{animation-duration:.01s}
+  .btn,.tile,.suspect,.progress i,.voter,.rx{transition:none}
 }
 </style>
 </head>
 <body>
 <div id="app"><div class="wrap"><div class="hero" style="padding-top:28px"><h1 class="wordmark">Czyj to<br>lajk<span class="q">?</span></h1><p class="lead" id="boot-msg">Ładuję grę…</p></div></div></div>
+<div id="fx" aria-hidden="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/preact/standalone.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
@@ -344,6 +383,8 @@ const COLORS = [
   ['#7B61FF', '#FFFFFF'], ['#E8459B', '#FFFFFF'], ['#12B5A6', '#0E1E2E'], ['#B5E550', '#1A1033'],
   ['#FF9EC4', '#1A1033'], ['#3D6BFF', '#FFFFFF'], ['#FF8F1F', '#1A1033'], ['#9B3FD1', '#FFFFFF']
 ];
+const AVATARS = ['😎', '🦊', '🐸', '🐼', '🦄', '🐙', '👽', '🤖', '🐯', '🦁', '🐨', '🐵', '🍕', '🌮', '👻', '🎧', '🦖', '🐧', '🍓', '🔥'];
+const REACTIONS = ['😂', '😱', '🔥', '🙈', '💀', '😍'];
 const CONS = 'BCDFGHJKLMNPRSTWZ', VOW = 'AEIOUY';
 const BAD_CODES = new Set(['DUPA', 'DUPE', 'DUPY', 'CIPA', 'CIPY', 'JEBE', 'JEBA', 'JEBY', 'SUKA', 'SUKI', 'KUTA', 'HUJA', 'HUJE', 'PEDA', 'CYCE', 'CYCA', 'SRAM', 'KUPA', 'KUPY', 'ZIGA']);
 // Phones talk through public MQTT brokers; the game publishes to both so one outage does not stop it.
@@ -366,8 +407,11 @@ const ENC = new TextEncoder(), DEC = new TextDecoder();
 const bytes = s => ENC.encode(s).length;
 const fmt = n => Number(n || 0).toLocaleString('pl-PL');
 const clampInt = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(Number(v) || 0)));
-const INVIS = /[\u0000-\u001F\u007F-\u009F­؜ᅟᅠ឴឵᠋-᠎​‌‎‏‪-‮⁠-⁯ㅤ﻿ﾠ￰-￻-]/g;
-function cleanName(s) { return Array.from(String(s || '').replace(INVIS, '').replace(/\s+/g, ' ').trim()).slice(0, 16).join('').trim(); }
+// control, formatting and private-use characters are stripped from names
+const INVISIBLE = [[0x0, 0x1F], [0x7F, 0x9F], [0xAD, 0xAD], [0x61C, 0x61C], [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180E], [0x200B, 0x200C], [0x200E, 0x200F], [0x2028, 0x202E], [0x2060, 0x206F], [0x3164, 0x3164], [0xE000, 0xF8FF], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFFB]];
+function stripInvisible(s) { let out = ''; for (const ch of s) { const c = ch.codePointAt(0); if (!INVISIBLE.some(r => c >= r[0] && c <= r[1])) out += ch; } return out; }
+function cleanName(s) { return Array.from(stripInvisible(String(s || '')).replace(/\s+/g, ' ').trim()).slice(0, 16).join('').trim(); }
+const validAv = a => (typeof a === 'string' && AVATARS.includes(a)) ? a : null;
 const SEG = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('pl', { granularity: 'grapheme' }) : null;
 function initial(name) {
   const s = String(name || '').trim();
@@ -383,6 +427,7 @@ function plural(n, one, few, many) {
 }
 const nTik = n => n + ' ' + plural(n, 'TikTok', 'TikToki', 'TikToków');
 const nOsob = n => n + ' ' + plural(n, 'osoba', 'osoby', 'osób');
+const nRund = n => n + ' ' + plural(n, 'runda', 'rundy', 'rund');
 function joinNames(names) {
   if (!names.length) return 'nie wiadomo kto';
   if (names.length === 1) return names[0];
@@ -397,6 +442,85 @@ function newCode() {
   return 'KOTA';
 }
 function joinLink(code) { return location.origin + location.pathname + '#' + code; }
+const reducedMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+
+/* ---------- sound and haptics ---------- */
+const SFX = { on: LS.get('czyjlajk.sound') !== false, ctx: null };
+function audio() {
+  if (!SFX.on) return null;
+  try {
+    if (!SFX.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; SFX.ctx = new AC(); }
+    if (SFX.ctx.state === 'suspended') SFX.ctx.resume();
+    return SFX.ctx;
+  } catch (e) { return null; }
+}
+function tone(freq, start, dur, type, gain) {
+  const a = audio();
+  if (!a) return;
+  try {
+    const t0 = a.currentTime + start;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain || 0.15, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  } catch (e) { /* audio is optional */ }
+}
+const sfx = {
+  tap() { tone(660, 0, 0.08, 'triangle', 0.12); },
+  round() { tone(440, 0, 0.1, 'triangle', 0.12); tone(660, 0.09, 0.16, 'triangle', 0.12); },
+  reveal() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.24, 'triangle', 0.15)); },
+  good() { tone(784, 0, 0.12, 'sine', 0.2); tone(1175, 0.1, 0.28, 'sine', 0.2); },
+  bad() { tone(233, 0, 0.18, 'sawtooth', 0.07); tone(175, 0.15, 0.32, 'sawtooth', 0.07); },
+  nudge() { tone(988, 0, 0.09, 'square', 0.07); tone(988, 0.15, 0.09, 'square', 0.07); tone(1319, 0.3, 0.14, 'square', 0.07); },
+  pop() { tone(1250, 0, 0.06, 'sine', 0.08); },
+  win() { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.12, 0.3, 'triangle', 0.14)); }
+};
+function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { /* not on this phone */ } }
+document.addEventListener('pointerdown', () => { if (SFX.on) audio(); }, { passive: true });
+
+/* ---------- floating reactions and confetti ---------- */
+const fxLayer = document.getElementById('fx');
+function spawnReaction(e, name) {
+  if (!fxLayer || fxLayer.childElementCount > 14) return;
+  const el = document.createElement('div');
+  el.className = 'fx-e';
+  el.style.left = (8 + Math.random() * 76) + '%';
+  el.style.setProperty('--sway', Math.round((Math.random() - 0.5) * 90) + 'px');
+  const big = document.createElement('span'); big.textContent = e; el.appendChild(big);
+  if (name) { const s = document.createElement('small'); s.textContent = name; el.appendChild(s); }
+  fxLayer.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+function confetti(colors) {
+  if (reducedMotion()) return;
+  const cv = document.createElement('canvas');
+  cv.className = 'confetti';
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  const parts = Array.from({ length: 150 }, () => ({
+    x: Math.random() * cv.width, y: -Math.random() * cv.height * 0.6, w: (6 + Math.random() * 6) * dpr, h: (9 + Math.random() * 9) * dpr,
+    vx: (Math.random() - 0.5) * 2.4 * dpr, vy: (2 + Math.random() * 3) * dpr, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3,
+    c: colors[Math.floor(Math.random() * colors.length)]
+  }));
+  const t0 = performance.now();
+  function frame(t) {
+    const el = t - t0;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.globalAlpha = Math.max(0, 1 - Math.max(0, el - 2600) / 1400);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.035 * dpr; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    }
+    if (el < 4000) requestAnimationFrame(frame); else cv.remove();
+  }
+  requestAnimationFrame(frame);
+}
 
 /* ---------- TikTok links ---------- */
 const URL_RE = /(?:https?:\/\/)?(?:[a-z0-9-]+\.)*tiktokv?\.(?:com|eu|us)\/[^\s"'<>\\)\]]*/gi;
@@ -503,11 +627,13 @@ async function resolveShort(c) {
   if (TEST && TEST.resolve) return TEST.resolve(c);
   const url = expand(c);
   const oe = 'https://www.tiktok.com/oembed?url=' + encodeURIComponent(url);
-  const proxy = u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u);
+  const viaAllOrigins = u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u);
+  const viaCodetabs = u => 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(u);
   const tries = [
     async () => fromOembed(await fetchWithin(oe, 6000)),
-    async () => fromOembed(await fetchWithin(proxy(oe), 9000)),
-    async () => fromPage(await fetchWithin(proxy(url), 10000, true))
+    async () => fromOembed(await fetchWithin(viaAllOrigins(oe), 9000)),
+    async () => fromOembed(await fetchWithin(viaCodetabs(oe), 9000)),
+    async () => fromPage(await fetchWithin(viaAllOrigins(url), 10000, true))
   ];
   for (const attempt of tries) {
     try { const r = await attempt(); if (r && COMPACT_RE.test(r) && !isShort(r)) return r; } catch (e) { /* next way */ }
@@ -660,6 +786,7 @@ function buildDeck(players, used) {
   }
   return deck;
 }
+function countVideos(players) { const ids = new Set(); for (const p of players) for (const c of p.links) ids.add(identity(c)); return ids.size; }
 function scoreRound(owners, votes) {
   const d = {};
   for (const voter in votes) {
@@ -670,13 +797,13 @@ function scoreRound(owners, votes) {
   return d;
 }
 function computeAwards(hist) {
-  const correct = {}, fooled = {};
+  const correct = {}, fooled = {}, read = {};
   let hard = null;
   for (const h of hist) {
     const voters = Object.keys(h.vt).filter(v => !h.o.includes(v));
     let wrong = 0;
     for (const v of voters) {
-      if (h.o.includes(h.vt[v])) correct[v] = (correct[v] || 0) + 1;
+      if (h.o.includes(h.vt[v])) { correct[v] = (correct[v] || 0) + 1; for (const o of h.o) read[o] = (read[o] || 0) + 1; }
       else { wrong++; for (const o of h.o) fooled[o] = (fooled[o] || 0) + 1; }
     }
     if (voters.length && wrong) {
@@ -688,8 +815,15 @@ function computeAwards(hist) {
   const aw = [];
   const det = top(correct); if (det) aw.push({ t: 'det', k: det[0], n: det[1] });
   const cam = top(fooled); if (cam) aw.push({ t: 'cam', k: cam[0], n: cam[1] });
+  const book = top(read); if (book && (!cam || book[0] !== cam[0] || book[1] > cam[1])) aw.push({ t: 'book', k: book[0], n: book[1] });
   if (hard) aw.push({ t: 'hard', l: hard.l, o: hard.o.slice(0, 4), n: hard.n, m: hard.m });
   return aw;
+}
+function recapOf(hist) {
+  return hist.slice(0, 30).map(h => {
+    const voters = Object.keys(h.vt).filter(v => !h.o.includes(v));
+    return [h.c, h.o.slice(0, 4), voters.filter(v => h.o.includes(h.vt[v])).length, voters.length];
+  });
 }
 function rankList(pl, sc) {
   const arr = (pl || []).map(x => ({ x, s: (sc && sc[x[0]]) || 0 }));
@@ -706,12 +840,13 @@ function uniqueNames(players) {
 
 /* ---------- state ---------- */
 const S = {
-  me: { key: 'p' + rid(9), name: '', links: [] },
+  me: { key: 'p' + rid(9), name: '', links: [], av: AVATARS[rint(AVATARS.length)] },
   mode: 'home',
   code: null, isHost: false, host: null, joinedAt: 0, myVote: null, sessionAt: 0,
   roomStatus: 'connecting', connected: false, discSince: 0, peers: [],
   hostG: null, lastG: null, hostSeen: false, hostAway: false, searchStart: 0,
-  solo: null, toast: null, homeNotice: null, hashCode: null
+  solo: null, toast: null, homeNotice: null, hashCode: null,
+  rx: null, nudge: null, kicked: false
 };
 function snapshot() {
   return { me: S.me, mode: S.mode, code: S.code, isHost: S.isHost, host: S.host, joinedAt: S.joinedAt, myVote: S.myVote, sessionAt: S.sessionAt, solo: S.solo };
@@ -721,19 +856,25 @@ function persist() { clearTimeout(persistT); persistT = setTimeout(() => LS.set(
 function restore(sv) {
   if (!sv || typeof sv !== 'object') return;
   const me = sv.me;
-  if (me && typeof me.key === 'string' && /^[a-z0-9]{6,16}$/.test(me.key)) S.me = { key: me.key, name: cleanName(me.name), links: validLinks(me.links) };
+  if (me && typeof me.key === 'string' && /^[a-z0-9]{6,16}$/.test(me.key)) S.me = { key: me.key, name: cleanName(me.name), links: validLinks(me.links), av: validAv(me.av) || S.me.av };
   const fresh = Date.now() - (Number(sv.sessionAt) || 0) < 12 * 3600 * 1000;
   if (sv.mode === 'multi' && fresh && typeof sv.code === 'string' && /^[A-Z]{4}$/.test(sv.code)) {
     S.mode = 'multi'; S.code = sv.code; S.sessionAt = sv.sessionAt;
     S.isHost = !!(sv.isHost && sv.host && sv.host.g && sv.host.g.id);
     S.host = S.isHost ? sv.host : null;
-    if (S.host) { S.host.deck = S.host.deck || []; S.host.hist = S.host.hist || []; S.host.used = S.host.used || []; S.host.skips = S.host.skips || 0; S.host.tv = !!S.host.tv; }
+    if (S.host) {
+      const H = S.host;
+      H.deck = H.deck || []; H.hist = H.hist || []; H.used = H.used || []; H.skips = H.skips || 0; H.tv = !!H.tv;
+      H.season = H.season && typeof H.season === 'object' ? H.season : {}; H.gn = H.gn || 0;
+      H.g.kick = Array.isArray(H.g.kick) ? H.g.kick : [];
+    }
     S.joinedAt = Number(sv.joinedAt) || Date.now();
     S.myVote = sv.myVote && typeof sv.myVote.r === 'string' ? sv.myVote : null;
     S.searchStart = Date.now();
   }
   if (sv.solo && typeof sv.solo === 'object' && Array.isArray(sv.solo.players)) {
     S.solo = sv.solo;
+    for (const p of S.solo.players) if (!validAv(p.av)) p.av = AVATARS[rint(AVATARS.length)];
     if (sv.mode === 'solo' && fresh) S.mode = 'solo';
   }
 }
@@ -746,6 +887,7 @@ function rerender() {
 function set(fn) { fn(S); persist(); syncPresence(); scheduleResolve(); rerender(); }
 let toastT = 0;
 function toast(msg) { S.toast = msg; rerender(); clearTimeout(toastT); toastT = setTimeout(() => { S.toast = null; rerender(); }, 2800); }
+function setSound(on) { SFX.on = on; LS.set('czyjlajk.sound', on); if (on) { audio(); sfx.pop(); } rerender(); }
 
 /* ---------- relay: presence over public MQTT brokers ---------- */
 // Same shape the game expects from a live room: presence(), peers(), onPeers(), onConnection(), leave().
@@ -887,6 +1029,7 @@ async function connectGame() {
   if (S.mode !== 'multi' || !S.code) return;
   const ch = relayJoin('g-' + S.code.toLowerCase());
   CH = ch;
+  seenRx.clear(); seenNudge.clear(); knownPeers.clear();
   unsubs.push(ch.onPeers(chg => { if (CH !== ch) return; S.peers = chg.peers; onPeersChanged(); }));
   unsubs.push(ch.onConnection(c => {
     if (CH !== ch) return;
@@ -908,6 +1051,7 @@ async function disconnectGame() {
   S.peers = []; S.connected = false; S.discSince = 0; lastPresence = null;
   if (ch) { try { await ch.leave(); } catch (e) { /* best effort */ } }
 }
+function kickedKeys() { const G = currentG(); return new Set((G && G.kick) || []); }
 function gamePeers() {
   const out = new Map();
   for (const p of S.peers) {
@@ -920,20 +1064,22 @@ function gamePeers() {
   return [...out.values()];
 }
 function lobbyPlayers() {
+  const kicked = kickedKeys();
   const list = gamePeers().map(p => {
     const pr = p.presence;
     const me = pr.key === S.me.key;
     return {
       key: pr.key,
       name: me ? (S.me.name || 'Gracz') : (cleanName(pr.name) || 'Gracz'),
+      av: me ? S.me.av : validAv(pr.av),
       jt: Number(pr.jt) || 0,
       links: me ? S.me.links : validLinks(pr.links),
       vote: me ? S.myVote : (pr.vote && typeof pr.vote === 'object' ? pr.vote : null),
       hostTag: !!(pr.g && typeof pr.g === 'object'),
       me
     };
-  });
-  if (S.mode === 'multi' && !list.some(p => p.me)) list.push({ key: S.me.key, name: S.me.name || 'Gracz', jt: S.joinedAt, links: S.me.links, vote: S.myVote, hostTag: S.isHost, me: true });
+  }).filter(p => p.me || !kicked.has(p.key));
+  if (S.mode === 'multi' && !list.some(p => p.me)) list.push({ key: S.me.key, name: S.me.name || 'Gracz', av: S.me.av, jt: S.joinedAt, links: S.me.links, vote: S.myVote, hostTag: S.isHost, me: true });
   list.sort((a, b) => (a.jt - b.jt) || (a.key < b.key ? -1 : 1));
   return list;
 }
@@ -947,6 +1093,7 @@ function hostPeer() {
   return best;
 }
 const gCache = new WeakMap();
+const strList = (a, max) => Array.isArray(a) ? a.filter(x => typeof x === 'string').slice(0, max) : [];
 function objNum(o) { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o).slice(0, 40)) { const v = Number(o[k]); if (isFinite(v)) r[k] = v; } return r; }
 function objStr(o) { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o).slice(0, 40)) if (typeof o[k] === 'string') r[k] = o[k]; return r; }
 function sanitizeG(g) {
@@ -955,20 +1102,20 @@ function sanitizeG(g) {
   const out = {
     id: String(g.id || ''), t0: Number(g.t0) || 0, gid: String(g.gid || ''),
     ph: ['lobby', 'play', 'reveal', 'end'].includes(g.ph) ? g.ph : 'lobby',
-    n: clampInt(g.n, 0, 99), i: clampInt(g.i, 0, 99), tv: !!g.tv,
-    out: Array.isArray(g.out) ? g.out.filter(x => typeof x === 'string').slice(0, MAX_PLAYERS) : [],
-    vd: Array.isArray(g.vd) ? g.vd.filter(x => typeof x === 'string').slice(0, MAX_PLAYERS) : [],
+    n: clampInt(g.n, 0, 99), i: clampInt(g.i, 0, 99), tv: !!g.tv, gn: clampInt(g.gn, 0, 999),
+    out: strList(g.out, MAX_PLAYERS), vd: strList(g.vd, MAX_PLAYERS), kick: strList(g.kick, 40),
     r: typeof g.r === 'string' ? g.r : null,
     l: typeof g.l === 'string' && COMPACT_RE.test(g.l) ? g.l : null,
-    pl: Array.isArray(g.pl) ? g.pl.filter(x => Array.isArray(x) && typeof x[0] === 'string').slice(0, MAX_PLAYERS).map(x => [x[0], cleanName(x[1]) || 'Gracz', clampInt(x[2], 0, COLORS.length - 1)]) : [],
+    pl: Array.isArray(g.pl) ? g.pl.filter(x => Array.isArray(x) && typeof x[0] === 'string').slice(0, MAX_PLAYERS).map(x => [x[0], cleanName(x[1]) || 'Gracz', clampInt(x[2], 0, COLORS.length - 1), validAv(x[3])]) : [],
     sc: objNum(g.sc), rv: null,
-    aw: Array.isArray(g.aw) ? g.aw.slice(0, 4).filter(a => a && typeof a === 'object').map(a => ({
+    aw: Array.isArray(g.aw) ? g.aw.slice(0, 5).filter(a => a && typeof a === 'object').map(a => ({
       t: String(a.t || ''), k: typeof a.k === 'string' ? a.k : null, n: clampInt(a.n, 0, 999), m: clampInt(a.m, 0, 999),
-      l: typeof a.l === 'string' && COMPACT_RE.test(a.l) ? a.l : null,
-      o: Array.isArray(a.o) ? a.o.filter(x => typeof x === 'string').slice(0, 8) : []
-    })) : []
+      l: typeof a.l === 'string' && COMPACT_RE.test(a.l) ? a.l : null, o: strList(a.o, 8)
+    })) : [],
+    hx: Array.isArray(g.hx) ? g.hx.slice(0, 30).filter(h => Array.isArray(h) && typeof h[0] === 'string' && COMPACT_RE.test(h[0])).map(h => [h[0], strList(h[1], 8), clampInt(h[2], 0, 99), clampInt(h[3], 0, 99)]) : [],
+    ss: Array.isArray(g.ss) ? g.ss.slice(0, MAX_PLAYERS * 2).filter(x => Array.isArray(x) && typeof x[0] === 'string').map(x => [x[0], cleanName(x[1]) || 'Gracz', clampInt(x[2], 0, COLORS.length - 1), validAv(x[3]), clampInt(x[4], 0, 999), clampInt(x[5], 0, 999999)]) : []
   };
-  if (g.rv && typeof g.rv === 'object') out.rv = { o: Array.isArray(g.rv.o) ? g.rv.o.filter(x => typeof x === 'string').slice(0, 8) : [], vt: objStr(g.rv.vt), d: objNum(g.rv.d) };
+  if (g.rv && typeof g.rv === 'object') out.rv = { o: strList(g.rv.o, 8), vt: objStr(g.rv.vt), d: objNum(g.rv.d) };
   if ((out.ph === 'play' || out.ph === 'reveal') && !out.l) out.ph = 'lobby';
   if (out.ph === 'reveal' && !out.rv) out.rv = { o: [], vt: {}, d: {} };
   gCache.set(g, out);
@@ -981,9 +1128,9 @@ function refreshHostView() {
 }
 function currentG() { return (S.isHost && S.host) ? S.host.g : (S.hostG || S.lastG || null); }
 function desiredPresence() {
-  if (S.mode !== 'multi' || !S.code) return null;
+  if (S.mode !== 'multi' || !S.code || S.kicked) return null;
   const G = currentG();
-  const p = { v: 1, code: S.code, key: S.me.key, name: S.me.name || 'Gracz', jt: S.joinedAt || 0, links: null, vote: null, g: null };
+  const p = { v: 1, code: S.code, key: S.me.key, name: S.me.name || 'Gracz', av: S.me.av || null, jt: S.joinedAt || 0, links: null, vote: null, g: null, rx: S.rx, nudge: S.nudge };
   if (!G || G.ph === 'lobby') p.links = S.me.links.slice(0, MAX_LINKS);
   if (G && G.ph === 'play' && S.myVote && S.myVote.r === G.r) p.vote = S.myVote;
   if (S.isHost && S.host) p.g = S.host.g;
@@ -1000,10 +1147,44 @@ function syncPresence() {
   lastPresence = txt;
   CH.presence(p).catch(() => { lastPresence = null; });
 }
+// reactions and nudges travel in presence as time-stamped counters; only an increase is a new signal
+// a peer seen for the first time only records its counters, so old signals are never replayed
+const seenRx = new Map(), seenNudge = new Map(), knownPeers = new Set();
+function processSignals() {
+  const G = currentG();
+  for (const p of gamePeers()) {
+    const pr = p.presence;
+    if (pr.key === S.me.key) continue;
+    const known = knownPeers.has(pr.key);
+    knownPeers.add(pr.key);
+    const who = cleanName(pr.name) || 'Ktoś';
+    const rx = pr.rx;
+    if (rx && typeof rx === 'object' && typeof rx.n === 'number' && REACTIONS.includes(rx.e)) {
+      const prev = seenRx.get(pr.key) || 0;
+      if (rx.n > prev) { seenRx.set(pr.key, rx.n); if (known) spawnReaction(rx.e, who); }
+    }
+    const nd = pr.nudge;
+    if (nd && typeof nd === 'object' && typeof nd.n === 'number') {
+      const prev = seenNudge.get(pr.key) || 0;
+      if (nd.n > prev) seenNudge.set(pr.key, nd.n);
+      if (known && nd.n > prev && nd.to === S.me.key && G && G.ph === 'play' && nd.r === G.r && !(S.myVote && S.myVote.r === G.r)) {
+        toast(who + ' Cię pogania! Zagłosuj 👀');
+        sfx.nudge(); buzz([70, 50, 70]);
+      }
+    }
+  }
+}
 function onPeersChanged() {
   if (S.mode !== 'multi') return;
   if (S.isHost && S.host) hostOnPeers();
   else refreshHostView();
+  processSignals();
+  const G = currentG();
+  if (!S.isHost && G && G.kick && G.kick.includes(S.me.key) && !S.kicked) {
+    S.kicked = true;
+    leaveGame().then(() => { S.kicked = false; S.homeNotice = 'Prowadzący usunął Cię z tej gry. Możesz dołączyć do innej albo założyć własną.'; rerender(); });
+    return;
+  }
   syncPresence();
   rerender();
 }
@@ -1030,7 +1211,7 @@ function hostOnPeers() {
       if (G.pl.length >= MAX_PLAYERS) continue;
       const usedCols = new Set(G.pl.map(x => x[2]));
       let col = 0; while (usedCols.has(col) && col < COLORS.length - 1) col++;
-      G.pl.push([p.key, p.name, col]);
+      G.pl.push([p.key, p.name, col, p.av || null]);
       if (!(p.key in G.sc)) G.sc[p.key] = 0;
       changed = true;
     }
@@ -1078,7 +1259,7 @@ function trackVotes() {
   const changed = vd.join(',') !== (G.vd || []).join(',');
   if (changed) G.vd = vd;
   const all = allVoted();
-  if (all && !revealT) revealT = setTimeout(() => { revealT = 0; if (allVoted()) doReveal(); }, 1100);
+  if (all && !revealT) revealT = setTimeout(() => { revealT = 0; if (allVoted()) doReveal(); }, 1400);
   else if (!all && revealT) { clearTimeout(revealT); revealT = 0; }
   return changed;
 }
@@ -1087,6 +1268,17 @@ function hostSkipPlayer(key) {
   if (G.ph !== 'play') return;
   G.out = (G.out || []).filter(k => k !== key).concat([key]);
   trackVotes();
+  commitHost();
+}
+function hostKick(key) {
+  const G = S.host.g;
+  if (key === S.me.key) return;
+  G.kick = (G.kick || []).filter(k => k !== key).concat([key]);
+  commitHost();
+}
+function hostUnkick(key) {
+  const G = S.host.g;
+  G.kick = (G.kick || []).filter(k => k !== key);
   commitHost();
 }
 function markUsed(id) { const u = S.host.used; if (!u.includes(id)) u.push(id); if (u.length > 400) u.splice(0, u.length - 400); }
@@ -1119,6 +1311,21 @@ function finishGame() {
   const H = S.host, G = H.g;
   G.ph = 'end'; G.l = null; G.rv = null; G.r = null;
   G.aw = computeAwards(H.hist);
+  G.hx = recapOf(H.hist);
+  // evening ranking across games
+  H.season = H.season || {};
+  H.gn = (H.gn || 0) + 1;
+  const ranked = rankList(G.pl, G.sc);
+  for (const r of ranked) {
+    const k = r.x[0];
+    const e = H.season[k] || { n: r.x[1], c: r.x[2], a: r.x[3], w: 0, p: 0 };
+    e.n = r.x[1]; e.c = r.x[2]; e.a = r.x[3];
+    e.p += r.s;
+    if (r.rank === 1 && r.s > 0) e.w += 1;
+    H.season[k] = e;
+  }
+  G.gn = H.gn;
+  G.ss = Object.entries(H.season).sort((a, b) => b[1].w - a[1].w || b[1].p - a[1].p).slice(0, MAX_PLAYERS * 2).map(([k, e]) => [k, e.n, e.c, e.a || null, e.w, e.p]);
   commitHost();
 }
 function hostNext() {
@@ -1149,16 +1356,16 @@ function hostStart() {
   H.deck = shuffle(deck.slice(0, n)).concat(deck.slice(n));
   H.hist = []; H.skips = 0; H.vc = null;
   const names = uniqueNames(players);
-  G.pl = players.map((p, i) => [p.key, names[i], i % COLORS.length]);
+  G.pl = players.map((p, i) => [p.key, names[i], i % COLORS.length, p.av || null]);
   G.sc = {}; for (const p of players) G.sc[p.key] = 0;
-  G.gid = rid(4); G.n = n; G.i = 1; G.aw = null; G.tv = !!H.tv; G.out = []; G.vd = [];
+  G.gid = rid(4); G.n = n; G.i = 1; G.aw = null; G.hx = null; G.tv = !!H.tv; G.out = []; G.vd = [];
   set(s => { s.myVote = null; });
   beginRound();
 }
 function hostToLobby() {
   const G = S.host.g;
   clearTimeout(revealT); revealT = 0;
-  G.ph = 'lobby'; G.pl = null; G.sc = null; G.rv = null; G.aw = null; G.l = null; G.r = null; G.i = 0; G.n = S.host.rounds; G.out = []; G.vd = [];
+  G.ph = 'lobby'; G.pl = null; G.sc = null; G.rv = null; G.aw = null; G.hx = null; G.l = null; G.r = null; G.i = 0; G.n = S.host.rounds; G.out = []; G.vd = [];
   commitHost();
 }
 
@@ -1183,7 +1390,7 @@ async function createGame(name) {
   set(s => {
     s.me.name = name; s.mode = 'multi'; s.code = newCode(); s.isHost = true; s.joinedAt = now; s.myVote = null; s.sessionAt = now;
     s.hostG = null; s.lastG = null; s.hostSeen = false; s.homeNotice = null;
-    s.host = { g: { id: rid(6), t0: now, gid: '', ph: 'lobby', n: 10, i: 0, tv: false, r: null, l: null, pl: null, sc: null, rv: null, aw: null }, rounds: 10, tv: false, deck: [], hist: [], used: [], skips: 0, vc: null };
+    s.host = { g: { id: rid(6), t0: now, gid: '', ph: 'lobby', n: 10, i: 0, tv: false, gn: 0, kick: [], r: null, l: null, pl: null, sc: null, rv: null, aw: null }, rounds: 10, tv: false, deck: [], hist: [], used: [], skips: 0, vc: null, season: {}, gn: 0 };
   });
   try { await connectGame(); requestWake(); }
   catch (e) { set(s => { s.mode = 'home'; s.isHost = false; s.host = null; s.homeNotice = 'Nie udało się połączyć z serwerem gry. Spróbuj jeszcze raz albo zagrajcie na jednym telefonie.'; }); }
@@ -1205,14 +1412,34 @@ async function leaveGame() {
   set(s => {
     if (s.mode === 'solo' && s.solo) s.solo.g = { ph: 'setup' };
     s.mode = 'home'; s.code = null; s.isHost = false; s.host = null; s.myVote = null;
-    s.hostG = null; s.lastG = null; s.hostSeen = false; s.hostAway = false;
+    s.hostG = null; s.lastG = null; s.hostSeen = false; s.hostAway = false; s.rx = null; s.nudge = null;
   });
   releaseWake();
 }
 function castVote(G, k) {
   if (G.ph !== 'play') return;
+  sfx.tap(); buzz(12);
   set(s => { s.myVote = { r: G.r, k }; });
   if (S.isHost && S.host && trackVotes()) commitHost();
+}
+let lastRx = 0;
+function sendReaction(e) {
+  const now = Date.now();
+  if (now - lastRx < 300) return;
+  lastRx = now;
+  spawnReaction(e, S.me.name ? S.me.name + ' (Ty)' : null);
+  sfx.pop();
+  if (S.mode === 'multi') { S.rx = { e, n: now }; syncPresence(); }
+}
+const nudgeAt = new Map();
+function sendNudge(G, key, name) {
+  const now = Date.now();
+  if (now - (nudgeAt.get(key) || 0) < 5000) { toast('Za szybko. Poczekaj chwilę.'); return; }
+  nudgeAt.set(key, now);
+  S.nudge = { to: key, n: now, r: G.r };
+  syncPresence();
+  sfx.tap();
+  toast('Poganiasz: ' + name);
 }
 function copyText(text, okMsg) {
   try {
@@ -1234,6 +1461,12 @@ function qrSvg(text) {
     return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
   } catch (e) { return null; }
 }
+// install as an app
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; rerender(); });
+window.addEventListener('appinstalled', () => { installEvt = null; LS.set('czyjlajk.installTip', 'done'); rerender(); });
+const isStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 /* ---------- one-phone mode ---------- */
 function soloInit() {
@@ -1241,7 +1474,7 @@ function soloInit() {
     s.mode = 'solo'; s.homeNotice = null; s.sessionAt = Date.now();
     if (!s.solo) s.solo = { players: [], rounds: 10, g: { ph: 'setup' }, deck: [], hist: [], used: [], skips: 0, guessed: {} };
     s.solo.g = s.solo.g && s.solo.g.ph ? s.solo.g : { ph: 'setup' };
-    if (!s.solo.players.length && s.me.name) s.solo.players.push({ key: s.me.key, name: s.me.name, links: s.me.links.slice() });
+    if (!s.solo.players.length && s.me.name) s.solo.players.push({ key: s.me.key, name: s.me.name, av: s.me.av, links: s.me.links.slice() });
   });
   requestWake();
 }
@@ -1256,7 +1489,7 @@ function soloStart() {
     const o = s.solo;
     o.deck = shuffle(deck.slice(0, n)).concat(deck.slice(n));
     o.hist = []; o.skips = 0; o.guessed = {};
-    o.g = { ph: 'play', gid: rid(4), n, i: 1, l: o.deck[0].c, pl: o.players.map((p, i) => [p.key, names[i], i % COLORS.length]), sc: Object.fromEntries(o.players.map(p => [p.key, 0])), rv: null, aw: null };
+    o.g = { ph: 'play', gid: rid(4), n, i: 1, l: o.deck[0].c, pl: o.players.map((p, i) => [p.key, names[i], i % COLORS.length, validAv(p.av)]), sc: Object.fromEntries(o.players.map(p => [p.key, 0])), rv: null, aw: null, hx: null };
   });
 }
 function soloVotes() {
@@ -1274,7 +1507,7 @@ function soloNext() {
     o.hist.push({ c: item.c, o: item.o, vt });
     o.used = o.used || []; if (!o.used.includes(item.id)) o.used.push(item.id);
     o.guessed = {};
-    if (g.i >= g.n) { g.ph = 'end'; g.aw = computeAwards(o.hist); g.l = null; }
+    if (g.i >= g.n) { g.ph = 'end'; g.aw = computeAwards(o.hist); g.hx = recapOf(o.hist); g.l = null; }
     else { g.i += 1; g.l = o.deck[g.i - 1].c; g.ph = 'play'; }
   });
 }
@@ -1285,7 +1518,7 @@ function soloSkip() {
     if (item) { o.used = o.used || []; o.used.push(item.id); }
     o.deck.splice(g.i - 1, 1); o.skips += 1;
     if (o.deck.length < g.n) g.n = o.deck.length;
-    if (g.i > g.n) { g.i = Math.max(g.n, 1); g.ph = 'end'; g.aw = computeAwards(o.hist); g.l = null; }
+    if (g.i > g.n) { g.i = Math.max(g.n, 1); g.ph = 'end'; g.aw = computeAwards(o.hist); g.hx = recapOf(o.hist); g.l = null; }
     else g.l = o.deck[g.i - 1].c;
   });
 }
@@ -1299,21 +1532,28 @@ const Icon = {
   check: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
   eye: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>`,
   mask: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c3-1.5 6-1.5 9 0 3-1.5 6-1.5 9 0 0 6-3 10-9 10S3 13 3 7z"/><path d="M7.5 10.5h2M14.5 10.5h2"/></svg>`,
-  tv: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg>`
+  book: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/></svg>`,
+  tv: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg>`,
+  sound: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>`,
+  mute: () => html`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>`
 };
 
 /* ---------- shared pieces ---------- */
-function Avatar({ name, col, size, cls }) {
+function Avatar({ name, col, av, size, cls }) {
   const c = COLORS[(col | 0) % COLORS.length];
-  return html`<span class=${'av' + (cls ? ' ' + cls : '')} style=${'--s:' + (size || 40) + 'px;--c:' + c[0] + ';--cf:' + c[1]} aria-hidden="true">${initial(name)}</span>`;
+  const emoji = validAv(av);
+  return html`<span class=${'av' + (emoji ? ' emo' : '') + (cls ? ' ' + cls : '')} style=${'--s:' + (size || 40) + 'px;--c:' + c[0] + ';--cf:' + c[1]} aria-hidden="true">${emoji || initial(name)}</span>`;
 }
 function RoundsPicker({ value, onChange }) {
   return html`<div class="seg" role="group" aria-label="Liczba rund">${ROUNDS.map(n => html`<button type="button" key=${n} aria-pressed=${value === n} onClick=${() => onChange(n)}>${n}</button>`)}</div>`;
 }
-function Tile({ c, small, label }) {
+function Reacts() {
+  return html`<div class="reacts" role="group" aria-label="Reakcje widoczne u wszystkich">${REACTIONS.map(e => html`<button type="button" class="rx" key=${e} aria-label=${'Wyślij reakcję ' + e} onClick=${() => sendReaction(e)}>${e}</button>`)}</div>`;
+}
+function Tile({ c, label }) {
   if (!c) return null;
   const h = handleOf(c);
-  return html`<a class=${'tile' + (small ? ' small' : '')} href=${expand(c)} target="_blank" rel="noopener noreferrer">
+  return html`<a class="tile" href=${expand(c)} target="_blank" rel="noopener noreferrer">
     <span class="thumb" style=${thumbStyle(c)}><span class="play">${Icon.play()}</span></span>
     <span class="tile-body">
       <span class="eyebrow">${label || (h ? 'Film od' : 'Losowy lajk')}</span>
@@ -1363,7 +1603,7 @@ function LineupReveal({ owners }) {
   const big = owners.length > 1 ? 82 : 104;
   return html`<div class="lineup">
     <div class="marks" aria-hidden="true">${[190, 180, 170, 160, 150].map(n => html`<span key=${n}>${n}</span>`)}</div>
-    <div class="suspects-row">${owners.map((o, i) => html`<${Avatar} key=${o[0]} name=${o[1]} col=${o[2]} size=${big} cls=${'pop' + (i ? ' d1' : '')} />`)}</div>
+    <div class="suspects-row">${owners.map((o, i) => html`<${Avatar} key=${o[0]} name=${o[1]} col=${o[2]} av=${o[3]} size=${big} cls=${'pop' + (i ? ' d1' : '')} />`)}</div>
     <div class="placard pop d1" role="status">
       <span class="pl-k">${owners.length > 1 ? 'Wspólny lajk · polubione przez' : 'Polubione przez'}</span>
       <strong>${joinNames(owners.map(o => o[1]))}</strong>
@@ -1371,14 +1611,23 @@ function LineupReveal({ owners }) {
     <div class="burst" aria-hidden="true">${burst.map((b, i) => html`<i key=${i} style=${'--dx:' + b.dx + 'px;--dy:' + b.dy + 'px;--rot:' + b.rot + 'deg;--sc:' + b.sc + ';animation-delay:' + b.d + 's'}>${Icon.heart()}</i>`)}</div>
   </div>`;
 }
-function Scoreboard({ pl, sc, d }) {
+function Scoreboard({ pl, sc, d, moves }) {
   const ranked = rankList(pl, sc);
-  return html`<div class="board">${ranked.map(r => html`<div class=${'brow' + (r.x[0] === S.me.key ? ' me' : '')} key=${r.x[0]}>
-    <span class="rank">${r.rank}.</span>
-    <${Avatar} name=${r.x[1]} col=${r.x[2]} size=${32} />
-    <span class="bname">${r.x[1]}</span>
-    <span class="bscore">${d && d[r.x[0]] ? html`<span class="delta">+${fmt(d[r.x[0]])}</span>` : null}${fmt(r.s)}</span>
-  </div>`)}</div>`;
+  let prev = null;
+  if (moves && d) {
+    const prevSc = {};
+    for (const x of pl) prevSc[x[0]] = ((sc && sc[x[0]]) || 0) - (d[x[0]] || 0);
+    prev = new Map(rankList(pl, prevSc).map(r => [r.x[0], r.rank]));
+  }
+  return html`<div class="board">${ranked.map(r => {
+    const mv = prev ? (prev.get(r.x[0]) || r.rank) - r.rank : 0;
+    return html`<div class=${'brow' + (r.x[0] === S.me.key ? ' me' : '')} key=${r.x[0]}>
+      <span class="rank">${r.rank}.</span>
+      <${Avatar} name=${r.x[1]} col=${r.x[2]} av=${r.x[3]} size=${32} />
+      <span class="bname"><span>${r.x[1]}</span>${mv > 0 ? html`<span class="mv up" title="awans">▲${mv}</span>` : mv < 0 ? html`<span class="mv down" title="spadek">▼${-mv}</span>` : null}</span>
+      <span class="bscore">${d && d[r.x[0]] ? html`<span class="delta">+${fmt(d[r.x[0]])}</span>` : null}${fmt(r.s)}</span>
+    </div>`;
+  })}</div>`;
 }
 function Podium({ ranked }) {
   const top = ranked.slice(0, 3);
@@ -1387,7 +1636,7 @@ function Podium({ ranked }) {
   return html`<div class="podium" style=${'--n:' + order.length}>${order.map(r => {
     const c = COLORS[r.x[2] % COLORS.length];
     return html`<div class=${'pod r' + Math.min(r.rank, 3)} key=${r.x[0]}>
-      <${Avatar} name=${r.x[1]} col=${r.x[2]} size=${48} />
+      <${Avatar} name=${r.x[1]} col=${r.x[2]} av=${r.x[3]} size=${52} />
       <span class="nm">${r.x[1]}</span>
       <span class="sc">${fmt(r.s)} pkt</span>
       <div class="bar" style=${'--c:' + c[0] + ';--cf:' + c[1]}>${r.rank}</div>
@@ -1399,6 +1648,7 @@ function Awards({ G }) {
   const items = (G.aw || []).map(a => {
     if (a.t === 'det' && by[a.k]) return { k: 'Detektyw wieczoru', v: by[a.k][1] + ' · ' + a.n + ' ' + plural(a.n, 'trafienie', 'trafienia', 'trafień'), ico: Icon.eye() };
     if (a.t === 'cam' && by[a.k]) return { k: 'Mistrz kamuflażu', v: by[a.k][1] + ' · ' + a.n + ' ' + plural(a.n, 'zmylona osoba', 'zmylone osoby', 'zmylonych osób'), ico: Icon.mask() };
+    if (a.t === 'book' && by[a.k]) return { k: 'Najłatwiej rozgryźć', v: by[a.k][1] + ' · zgadnięte lajki: ' + a.n, ico: Icon.book() };
     if (a.t === 'hard' && a.l) return { k: 'Najtrudniejszy TikTok', v: 'Lajk: ' + joinNames(a.o.map(k => by[k] && by[k][1]).filter(Boolean)) + ' · pudła: ' + a.n + ' z ' + a.m, ico: Icon.heart(), l: a.l };
     return null;
   }).filter(Boolean);
@@ -1408,17 +1658,57 @@ function Awards({ G }) {
     <div class="meta"><span class="aw-k">${it.k}</span><span class="aw-v">${it.v}</span>${it.l ? html`<a class="small" href=${expand(it.l)} target="_blank" rel="noopener noreferrer">Obejrzyj jeszcze raz</a>` : null}</div>
   </div>`)}</div>`;
 }
-function End({ G, primary, secondary }) {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+function Recap({ G }) {
+  const [open, setOpen] = useState(-1);
+  const by = keyMap(G.pl);
+  if (!G.hx || !G.hx.length) return null;
+  return html`<div class="section">
+    <h2 class="h3">Powtórka: wszystkie TikToki z gry</h2>
+    <div class="recap">${G.hx.map((h, i) => {
+      const owners = joinNames(h[1].map(k => by[k] && by[k][1]).filter(Boolean));
+      return html`<div class="rc" key=${i}>
+        <div class="rc-top">
+          <span class="rc-n">${i + 1}</span>
+          <span class="rc-txt"><b>${handleOf(h[0]) || describe(h[0])}</b><span class="muted">Lajk: ${owners} · trafienia: ${h[2]} z ${h[3]}</span></span>
+          ${videoId(h[0])
+            ? html`<button class="rc-play" type="button" aria-expanded=${open === i} aria-label=${open === i ? 'Schowaj film' : 'Obejrzyj film'} onClick=${() => setOpen(open === i ? -1 : i)}>${open === i ? Icon.x() : Icon.play()}</button>`
+            : html`<a class="rc-play" href=${expand(h[0])} target="_blank" rel="noopener noreferrer" aria-label="Otwórz w TikToku">${Icon.ext()}</a>`}
+        </div>
+        ${open === i ? html`<${Player} c=${h[0]} />` : null}
+      </div>`;
+    })}</div>
+  </div>`;
+}
+function Season({ G }) {
+  if (!G.ss || !G.ss.length || (G.gn || 0) < 2) return null;
+  return html`<div class="section">
+    <h2 class="h3">Ranking wieczoru · ${G.gn} ${plural(G.gn, 'gra', 'gry', 'gier')}</h2>
+    <div class="board">${G.ss.map((x, i) => html`<div class=${'brow' + (x[0] === S.me.key ? ' me' : '')} key=${x[0]}>
+      <span class="rank">${G.ss.findIndex(y => y[4] === x[4] && y[5] === x[5]) + 1}.</span>
+      <${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} size=${32} />
+      <span class="bname"><span>${x[1]}</span>${x[4] ? html`<span class="wins" title=${'wygrane: ' + x[4]}>${'🏆'.repeat(Math.min(x[4], 5))}</span>` : null}</span>
+      <span class="bscore">${fmt(x[5])}</span>
+    </div>`)}</div>
+  </div>`;
+}
+function End({ G, primary, secondary, sticky }) {
   const ranked = rankList(G.pl, G.sc);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    sfx.win(); buzz([40, 60, 40, 60, 120]);
+    confetti(COLORS.map(c => c[0]));
+  }, []);
   const top = ranked.filter(r => r.rank === 1);
   const title = top.length > 1 ? 'Remis: ' + joinNames(top.map(r => r.x[1])) : top[0] ? 'Wygrywa ' + top[0].x[1] : 'Koniec gry';
   return html`<section class="stack-lg">
     <div class="section center"><span class="eyebrow like">Koniec gry</span><h1 class="h1">${title}</h1></div>
     <${Podium} ranked=${ranked} />
+    ${S.mode === 'multi' ? html`<${Reacts} />` : null}
     <${Awards} G=${G} />
     <div class="section"><h2 class="h3">Pełne wyniki</h2><${Scoreboard} pl=${G.pl} sc=${G.sc} /></div>
-    <div class="dock">${primary}${secondary}</div>
+    <${Season} G=${G} />
+    <${Recap} G=${G} />
+    <div class=${sticky ? 'dock' : 'section'}>${primary}${secondary}</div>
   </section>`;
 }
 const STATE_LABEL = { ok: '▶ w grze', wait: 'sprawdzam…', out: '↗ w TikToku' };
@@ -1431,7 +1721,7 @@ function LinkAdder({ idp, links, onChange }) {
     if (!found.length) { setMsg({ k: 'err', t: 'Nie widzę tu linku do TikToka. W TikToku dotknij Udostępnij, potem Kopiuj link.' }); return false; }
     const r = mergeLinks(links, found);
     onChange(r.list);
-    if (r.added) setMsg({ k: 'ok', t: 'Dodano ' + nTik(r.added) + '.' + (r.dup ? ' Pominięte powtórki: ' + r.dup + '.' : '') + (r.cut ? ' Limit to ' + MAX_LINKS + '.' : '') });
+    if (r.added) { setMsg({ k: 'ok', t: 'Dodano ' + nTik(r.added) + '.' + (r.dup ? ' Pominięte powtórki: ' + r.dup + '.' : '') + (r.cut ? ' Limit to ' + MAX_LINKS + '.' : '') }); sfx.pop(); }
     else setMsg({ k: 'err', t: r.cut ? 'Masz już ' + MAX_LINKS + ' TikToków. To wystarczy.' : 'Ten TikTok już jest na liście.' });
     return true;
   }
@@ -1498,6 +1788,7 @@ function TopBar() {
       <div class="top-right">
         ${S.mode === 'multi' && S.code ? html`<span class="chip" aria-label=${'Kod gry ' + S.code + (S.connected ? ', połączono' : ', brak połączenia')}><span class=${'dot' + (S.connected ? '' : ' off')}></span>${S.code}</span>` : null}
         ${S.mode === 'solo' ? html`<span class="chip">Jeden telefon</span>` : null}
+        <button class="chip icon" type="button" aria-pressed=${SFX.on} aria-label=${SFX.on ? 'Wycisz dźwięki gry' : 'Włącz dźwięki gry'} onClick=${() => setSound(!SFX.on)}>${SFX.on ? Icon.sound() : Icon.mute()}</button>
         ${inGame ? html`<button class="chip" type="button" aria-expanded=${ask} onClick=${() => setAsk(!ask)}>Wyjdź</button>` : null}
       </div>
     </header>
@@ -1510,10 +1801,20 @@ function HeroArt() {
   return html`<div class="lineup hero-lineup" aria-hidden="true">
     <div class="marks"><span>190</span><span>180</span><span>170</span><span>160</span></div>
     <div class="suspects-row">
-      <${Avatar} name="O" col=${1} size=${58} />
-      <span class="mid"><span class="bubble">${Icon.heart()}<b>?</b></span><${Avatar} name="K" col=${4} size=${72} /></span>
-      <${Avatar} name="Z" col=${2} size=${58} />
+      <${Avatar} name="O" col=${1} av="🦊" size=${58} />
+      <span class="mid"><span class="bubble">${Icon.heart()}<b>?</b></span><${Avatar} name="K" col=${4} av="😎" size=${72} /></span>
+      <${Avatar} name="Z" col=${2} av="🐸" size=${58} />
     </div>
+  </div>`;
+}
+function InstallTip() {
+  const [hidden, setHidden] = useState(LS.get('czyjlajk.installTip') === 'done');
+  if (hidden || isStandalone() || (!installEvt && !isIOS)) return null;
+  const dismiss = () => { LS.set('czyjlajk.installTip', 'done'); setHidden(true); };
+  return html`<div class="install">
+    <span class="grow"><b>Zainstaluj grę jak aplikację</b><span class="muted">${installEvt ? 'Ikona na ekranie, pełny ekran i szybki start.' : 'W Safari: Udostępnij → Do ekranu początkowego.'}</span></span>
+    ${installEvt ? html`<button class="btn btn-primary w-auto" type="button" onClick=${async () => { try { installEvt.prompt(); await installEvt.userChoice; } catch (e) { /* closed */ } installEvt = null; dismiss(); }}>Instaluj</button>` : null}
+    <button class="x" type="button" aria-label="Ukryj podpowiedź" onClick=${dismiss}>${Icon.x()}</button>
   </div>`;
 }
 function Home() {
@@ -1577,6 +1878,7 @@ function Home() {
       <button class="btn btn-secondary" type="button" onClick=${() => { const n = cleanName(name); if (n) { S.me.name = n; } soloInit(); }}>Gramy na jednym telefonie</button>
       <p class="small muted">Bez łączenia telefonów: podajecie sobie jeden telefon i typujecie na głos.</p>
     </div>
+    <${InstallTip} />
     <div class="section">
       <h2 class="h3">Jak to działa</h2>
       <ol class="steps">
@@ -1603,7 +1905,7 @@ function Multi() {
   if (G.ph === 'lobby') view = html`<${Lobby} G=${G} />`;
   else if (G.ph === 'play') view = html`<${Round} key=${'p' + G.r} G=${G} />`;
   else if (G.ph === 'reveal') view = html`<${Reveal} key=${'r' + G.r} G=${G} />`;
-  else view = html`<${End} G=${G}
+  else view = html`<${End} key=${'e' + G.gid} G=${G} sticky=${S.isHost}
       primary=${S.isHost ? html`<button class="btn btn-primary" type="button" onClick=${hostToLobby}>Zagrajmy jeszcze raz</button>` : html`<p class="waiting">Prowadzący może zacząć nową grę</p>`}
       secondary=${html`<button class="btn btn-quiet" type="button" onClick=${leaveGame}>Wyjdź z gry</button>`} />`;
   return html`${Banners()}${view}`;
@@ -1632,9 +1934,31 @@ function ShareJoin({ code }) {
     </div>
   </div>`;
 }
+function MeEditor({ onDone }) {
+  const [name, setName] = useState(S.me.name || '');
+  function save(e) {
+    if (e) e.preventDefault();
+    const n = cleanName(name);
+    if (!n) return;
+    set(s => { s.me.name = n; });
+    onDone();
+  }
+  return html`<form class="editor" onSubmit=${save} novalidate>
+    <label class="label" for="me-name">Imię</label>
+    <input id="me-name" class="input" value=${name} maxlength="24" autocomplete="nickname" enterkeyhint="done" onInput=${e => setName(e.target.value)} />
+    <span class="label">Awatar</span>
+    <div class="avpick" role="group" aria-label="Wybierz awatar">${AVATARS.map(a => html`<button type="button" key=${a} aria-pressed=${S.me.av === a} aria-label=${'Awatar ' + a} onClick=${() => { set(s => { s.me.av = a; }); sfx.pop(); }}>${a}</button>`)}</div>
+    <button class="btn btn-primary" type="submit">Gotowe</button>
+  </form>`;
+}
 function Lobby({ G }) {
+  const [editing, setEditing] = useState(false);
+  const [kickAsk, setKickAsk] = useState(null);
   const players = lobbyPlayers();
   const ready = players.filter(p => p.links.length).length;
+  const videos = countVideos(players);
+  const rounds = S.isHost ? S.host.rounds : (G.n || 10);
+  const kicked = (G.kick || []);
   return html`<section class="stack-lg">
     <div class="section">
       <span class="eyebrow">Kod gry</span>
@@ -1645,14 +1969,21 @@ function Lobby({ G }) {
     </div>
     <div class="section">
       <h2 class="h2">Gracze · ${players.length}</h2>
-      <div class="plist">${players.map((p, i) => html`<div class="prow" key=${p.key}>
-        <${Avatar} name=${p.name} col=${i % COLORS.length} />
-        <div class="meta"><span class="nm">${p.name}${p.me ? ' (Ty)' : ''}</span><span class=${'sub' + (p.links.length ? ' okc' : '')}>${p.links.length ? nTik(p.links.length) : 'jeszcze bez TikToków'}</span></div>
-        ${p.hostTag ? html`<span class="tag">prowadzi</span>` : null}
+      <div class="plist">${players.map((p, i) => html`<div class="pcard" key=${p.key}>
+        <div class="prow">
+          <${Avatar} name=${p.name} col=${i % COLORS.length} av=${p.av} />
+          <div class="meta"><span class="nm">${p.name}${p.me ? ' (Ty)' : ''}</span><span class=${'sub' + (p.links.length ? ' okc' : '')}>${p.links.length ? nTik(p.links.length) : 'jeszcze bez TikToków'}</span></div>
+          ${p.hostTag ? html`<span class="tag">prowadzi</span>` : null}
+          ${p.me ? html`<button class="btn btn-quiet like" type="button" aria-expanded=${editing} onClick=${() => setEditing(!editing)}>${editing ? 'Zwiń' : 'Zmień'}</button>` : null}
+          ${S.isHost && !p.me ? html`<button class="btn btn-quiet danger" type="button" onClick=${() => setKickAsk(kickAsk === p.key ? null : p.key)}>Usuń</button>` : null}
+        </div>
+        ${p.me && editing ? html`<${MeEditor} onDone=${() => setEditing(false)} />` : null}
+        ${kickAsk === p.key ? html`<div class="editor"><p class="small">Usunąć z gry: <b>${p.name}</b>? Ta osoba nie wróci do tej gry, dopóki jej nie przywrócisz.</p><div class="row"><button class="btn btn-secondary grow" type="button" onClick=${() => setKickAsk(null)}>Anuluj</button><button class="btn btn-secondary danger grow" type="button" onClick=${() => { hostKick(p.key); setKickAsk(null); }}>Usuń</button></div></div>` : null}
       </div>`)}</div>
+      ${S.isHost && kicked.length ? html`<div class="row between small muted"><span>Usunięte osoby: ${kicked.length}</span><button class="btn btn-quiet" type="button" onClick=${() => { for (const k of kicked) hostUnkick(k); }}>Przywróć wszystkich</button></div>` : null}
       <details class="how"><summary>Ktoś nie widzi gry?</summary><ol>
         <li>Każdy musi mieć internet i otwartą tę stronę z tym samym kodem.</li>
-        <li>Gra łączy telefony przez darmowy, publiczny serwer, więc wpisujcie tylko imiona i linki do TikToków.</li>
+        <li>Gra łączy telefony przez darmowy, publiczny serwer, więc wpisujcie tylko imiona i linki do TikToków. Obcych możesz usunąć z gry.</li>
         <li>Jeśli połączenie nie działa, wyjdź i wybierz grę na jednym telefonie.</li>
       </ol></details>
     </div>
@@ -1671,10 +2002,11 @@ function Lobby({ G }) {
         <button type="button" aria-pressed=${!!S.host.tv} onClick=${() => { S.host.tv = true; S.host.g.tv = true; commitHost(); }}>Tylko u mnie</button>
       </div>
     </div>` : html`<p class="small muted">Rundy: ${G.n || 10}. ${G.tv ? 'Filmy lecą na telefonie prowadzącego.' : 'Filmy lecą na każdym telefonie.'} Prowadzący zaczyna grę, gdy wszyscy są gotowi.</p>`}
+    <${Season} G=${G} />
     <div class="dock">
       ${S.isHost ? html`
         <button class="btn btn-primary" type="button" disabled=${ready < 2} onClick=${hostStart}>Zaczynamy</button>
-        <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : 'Z TikTokami: ' + nOsob(ready) + '.'}</p>` : html`<p class="waiting">Czekamy, aż prowadzący zacznie</p>`}
+        <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : videos < rounds ? 'Zagracie ' + nRund(videos) + ', bo tyle jest TikToków. Dodajcie więcej, żeby grać dłużej.' : 'Z TikTokami: ' + nOsob(ready) + ' · TikToków w puli: ' + videos + '.'}</p>` : html`<p class="waiting">Czekamy, aż prowadzący zacznie</p>`}
     </div>
   </section>`;
 }
@@ -1684,20 +2016,23 @@ function WaitList({ G, voted, present }) {
   const waiting = active.filter(x => !voted.has(x[0]));
   const done = active.length - waiting.length;
   const skipped = G.pl.filter(x => out.has(x[0]));
+  const iVoted = voted.has(S.me.key);
   return html`<div class="waitbox" role="status">
     <div class="votestatus">
-      <div class="voters">${active.map(x => html`<span class=${'voter' + (voted.has(x[0]) ? ' done' : '')} key=${x[0]} title=${x[1]}><${Avatar} name=${x[1]} col=${x[2]} size=${30} /></span>`)}</div>
+      <div class="voters">${active.map(x => html`<span class=${'voter' + (voted.has(x[0]) ? ' done' : '')} key=${x[0]} title=${x[1]}><${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} size=${30} /></span>`)}</div>
       <span class="small muted">Odpowiedzi: ${done} z ${active.length}</span>
     </div>
     ${waiting.length ? html`<div class="waitlist">
       <span class="label">Czekamy na wszystkich. Brakuje:</span>
       ${waiting.map(x => {
         const off = !present.has(x[0]);
+        const me = x[0] === S.me.key;
         return html`<div class="wl" key=${x[0]}>
-          <${Avatar} name=${x[1]} col=${x[2]} size=${28} />
-          <span class="nm grow">${x[1]}${x[0] === S.me.key ? ' (Ty)' : ''}</span>
+          <${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} size=${28} />
+          <span class="nm grow">${x[1]}${me ? ' (Ty)' : ''}</span>
           <span class=${'wl-st' + (off ? ' off' : '')}>${off ? 'offline' : 'wybiera…'}</span>
           ${S.isHost && off ? html`<button class="btn btn-quiet" type="button" onClick=${() => hostSkipPlayer(x[0])}>Nie czekaj</button>` : null}
+          ${!off && !me && iVoted ? html`<button class="btn btn-quiet like" type="button" onClick=${() => sendNudge(G, x[0], x[1])}>Pogoń</button>` : null}
         </div>`;
       })}
     </div>` : html`<p class="waiting">Wszyscy odpowiedzieli. Odkrywam…</p>`}
@@ -1712,7 +2047,7 @@ function HostRoundControls() {
   </div>`;
 }
 function Round({ G }) {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => { window.scrollTo(0, 0); sfx.round(); }, []);
   const me = S.me.key;
   const inGame = G.pl.some(x => x[0] === me);
   const opts = G.pl.filter(x => x[0] !== me);
@@ -1722,20 +2057,24 @@ function Round({ G }) {
   const voted = new Set(G.vd || []);
   for (const p of players) if (p.vote && p.vote.r === G.r) voted.add(p.key);
   if (S.isHost && S.host.vc && S.host.vc.r === G.r) for (const k in S.host.vc.m) voted.add(k);
+  const out = new Set(G.out || []);
+  const waitingOthers = G.pl.filter(x => !out.has(x[0]) && !voted.has(x[0]) && x[0] !== me).length;
   const showVideo = !G.tv || S.isHost;
   return html`<section class="stack">
     <${RoundHead} G=${G} />
     ${showVideo ? html`<${Player} c=${G.l} />` : html`<div class="tvnote">${Icon.tv()}<span>Film leci na telefonie prowadzącego. Oglądajcie razem i typujcie tutaj.</span></div>`}
+    ${inGame && !mine && waitingOthers === 0 && G.pl.length > 1 ? html`<div class="spot" role="status">Wszyscy czekają na Ciebie 👀</div>` : null}
     <div class="section">
       <h2 class="h2">Kto to polubił?</h2>
       ${!inGame ? html`<p class="note">Dołączasz do gry. Za chwilę zobaczysz, na kogo możesz typować.</p>`
         : opts.length ? html`<div class="suspects">${opts.map(x => html`<button key=${x[0]} type="button" class="suspect" aria-pressed=${mine === x[0]} onClick=${() => castVote(G, x[0])}>
-            <${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span>${mine === x[0] ? html`<span class="tick">${Icon.check()}</span>` : null}
+            <${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} /><span class="nm">${x[1]}</span>${mine === x[0] ? html`<span class="tick">${Icon.check()}</span>` : null}
           </button>`)}</div>`
         : html`<p class="muted">Brakuje innych graczy.</p>`}
       <p class="small muted">${mine ? 'Typ zapisany. Możesz go zmienić, dopóki wszyscy nie odpowiedzą.' : 'Jeśli to Twój lajk, wskaż kogoś innego, żeby zmylić resztę.'}</p>
     </div>
     <${WaitList} G=${G} voted=${voted} present=${present} />
+    <${Reacts} />
     ${S.isHost ? html`<${HostRoundControls} />` : null}
   </section>`;
 }
@@ -1752,24 +2091,33 @@ function VoteResults({ G }) {
     const cls = own ? 'own' : t ? (ok ? 'ok' : 'no') : 'none';
     const pts = rv.d[x[0]] || 0;
     return html`<div class=${'res ' + cls} key=${x[0]}>
-      <${Avatar} name=${x[1]} col=${x[2]} size=${30} />
+      <${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} size=${30} />
       <span class="res-txt"><b>${x[1]}</b>${t && by[t] ? html`<span class="arrow"> → </span>${by[t][1]}` : html` <span class="muted">bez typu</span>`}${own ? html`<span class="mark own">${t ? 'blef' : 'lajk'}</span>` : t ? html`<span class=${'mark ' + (ok ? 'ok' : 'no')}>${ok ? '✓' : '✗'}</span>` : null}</span>
       <span class="pts">${pts ? '+' + fmt(pts) : '0'}</span>
     </div>`;
   })}</div>`;
 }
 function Reveal({ G }) {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
   const rv = G.rv, by = keyMap(G.pl), me = S.me.key;
   const owners = rv.o.map(k => by[k]).filter(Boolean);
   const g = rv.vt[me];
   const kind = rv.o.includes(me) ? 'own' : g ? (rv.o.includes(g) ? 'ok' : 'no') : 'none';
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    sfx.reveal(); buzz(25);
+    const t = setTimeout(() => {
+      if (kind === 'ok' || (kind === 'own' && (rv.d[me] || 0) > 0)) { sfx.good(); buzz([30, 40, 30]); }
+      else if (kind === 'no') { sfx.bad(); buzz(120); }
+    }, 520);
+    return () => clearTimeout(t);
+  }, []);
   return html`<section class="stack">
     <${RoundHead} G=${G} />
     <${LineupReveal} owners=${owners} />
     ${by[me] ? html`<${Outcome} kind=${kind} pts=${rv.d[me] || 0} guess=${by[g]} />` : null}
+    <${Reacts} />
     <div class="section"><h2 class="h3">Kto jak typował</h2><${VoteResults} G=${G} /></div>
-    <div class="section"><h2 class="h3">Wyniki po ${G.i}. rundzie</h2><${Scoreboard} pl=${G.pl} sc=${G.sc} d=${rv.d} /></div>
+    <div class="section"><h2 class="h3">Wyniki po ${G.i}. rundzie</h2><${Scoreboard} pl=${G.pl} sc=${G.sc} d=${rv.d} moves=${G.i > 1} /></div>
     <div class="dock">${S.isHost
       ? html`<button class="btn btn-primary" type="button" onClick=${hostNext}>${G.i >= G.n ? 'Pokaż wyniki końcowe' : 'Następna runda'}</button>`
       : html`<p class="waiting">Prowadzący zaraz przełączy dalej</p>`}</div>
@@ -1780,7 +2128,7 @@ function Solo() {
   const so = S.solo, g = so.g;
   if (g.ph === 'play') return html`<${SoloRound} key=${'p' + g.gid + g.i + '.' + so.skips} />`;
   if (g.ph === 'reveal') return html`<${SoloReveal} key=${'r' + g.gid + g.i} />`;
-  if (g.ph === 'end') return html`<${End} G=${g}
+  if (g.ph === 'end') return html`<${End} key=${'e' + g.gid} G=${g} sticky=${true}
     primary=${html`<button class="btn btn-primary" type="button" onClick=${() => set(s => { s.solo.g = { ph: 'setup' }; })}>Zagrajcie jeszcze raz</button>`}
     secondary=${html`<button class="btn btn-quiet" type="button" onClick=${leaveGame}>Wyjdź</button>`} />`;
   return html`<${SoloSetup} />`;
@@ -1791,13 +2139,14 @@ function SoloSetup() {
   const [open, setOpen] = useState(null);
   const [del, setDel] = useState(null);
   const ready = so.players.filter(p => p.links.length).length;
+  const videos = countVideos(so.players);
   function add(e) {
     e.preventDefault();
     const n = cleanName(name);
     if (!n) return;
     if (so.players.length >= MAX_PLAYERS) { toast('Maksymalnie ' + MAX_PLAYERS + ' graczy.'); return; }
     const key = 'p' + rid(9);
-    set(s => { s.solo.players.push({ key, name: n, links: [] }); });
+    set(s => { s.solo.players.push({ key, name: n, av: AVATARS[rint(AVATARS.length)], links: [] }); });
     setName(''); setOpen(key);
   }
   return html`<section class="stack-lg">
@@ -1813,7 +2162,7 @@ function SoloSetup() {
     </form>
     ${so.players.length ? html`<div class="plist">${so.players.map((p, i) => html`<div class="pcard" key=${p.key}>
       <div class="prow">
-        <${Avatar} name=${p.name} col=${i % COLORS.length} />
+        <${Avatar} name=${p.name} col=${i % COLORS.length} av=${p.av} />
         <div class="meta"><span class="nm">${p.name}</span><span class=${'sub' + (p.links.length ? ' okc' : '')}>${p.links.length ? nTik(p.links.length) : 'jeszcze bez TikToków'}</span></div>
         <button class="btn btn-quiet" type="button" aria-expanded=${open === p.key} onClick=${() => { setOpen(open === p.key ? null : p.key); setDel(null); }}>${open === p.key ? 'Zwiń' : p.links.length ? 'Edytuj' : 'Dodaj TikToki'}</button>
       </div>
@@ -1830,12 +2179,12 @@ function SoloSetup() {
     </div>
     <div class="dock">
       <button class="btn btn-primary" type="button" disabled=${ready < 2} onClick=${soloStart}>Zaczynamy</button>
-      <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : 'Z TikTokami: ' + nOsob(ready) + '.'}</p>
+      <p class="hint">${ready < 2 ? 'Potrzeba co najmniej 2 osób z TikTokami (najlepiej 3 lub więcej).' : videos < so.rounds ? 'Zagracie ' + nRund(videos) + ', bo tyle jest TikToków.' : 'Z TikTokami: ' + nOsob(ready) + '.'}</p>
     </div>
   </section>`;
 }
 function SoloRound() {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => { window.scrollTo(0, 0); sfx.round(); }, []);
   const [ask, setAsk] = useState(false);
   const g = S.solo.g;
   return html`<section class="stack">
@@ -1845,7 +2194,7 @@ function SoloRound() {
       <h2 class="h2">Kto to polubił?</h2>
       <p class="muted">Obejrzyjcie razem i typujcie na głos. Kto polubił, ten udaje, że nic nie wie.</p>
     </div>
-    <div class="suspects">${g.pl.map(x => html`<div class="suspect" key=${x[0]}><${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span></div>`)}</div>
+    <div class="suspects">${g.pl.map(x => html`<div class="suspect" key=${x[0]}><${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} /><span class="nm">${x[1]}</span></div>`)}</div>
     <div class="dock">
       <button class="btn btn-primary" type="button" onClick=${() => set(s => { s.solo.g.ph = 'reveal'; s.solo.guessed = {}; })}>Odkryj</button>
       ${ask ? html`<div class="row"><button class="btn btn-quiet grow" type="button" onClick=${() => setAsk(false)}>Anuluj</button><button class="btn btn-quiet danger grow" type="button" onClick=${() => { setAsk(false); soloSkip(); }}>Tak, pomiń</button></div>`
@@ -1854,7 +2203,7 @@ function SoloRound() {
   </section>`;
 }
 function SoloReveal() {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => { window.scrollTo(0, 0); sfx.reveal(); buzz(25); }, []);
   const so = S.solo, g = so.g, item = so.deck[g.i - 1];
   const by = keyMap(g.pl);
   const owners = item.o.map(k => by[k]).filter(Boolean);
@@ -1866,11 +2215,11 @@ function SoloReveal() {
     <div class="section">
       <h2 class="h3">Kto zgadł?</h2>
       <p class="small muted">Zaznacz osoby, które trafiły. Punkty liczą się od razu.</p>
-      <div class="suspects">${guessers.map(x => html`<button type="button" class="suspect" key=${x[0]} aria-pressed=${!!so.guessed[x[0]]} onClick=${() => set(s => { s.solo.guessed[x[0]] = !s.solo.guessed[x[0]]; })}>
-        <${Avatar} name=${x[1]} col=${x[2]} /><span class="nm">${x[1]}</span>${so.guessed[x[0]] ? html`<span class="tick">${Icon.check()}</span>` : null}
+      <div class="suspects">${guessers.map(x => html`<button type="button" class="suspect" key=${x[0]} aria-pressed=${!!so.guessed[x[0]]} onClick=${() => { sfx.tap(); set(s => { s.solo.guessed[x[0]] = !s.solo.guessed[x[0]]; }); }}>
+        <${Avatar} name=${x[1]} col=${x[2]} av=${x[3]} /><span class="nm">${x[1]}</span>${so.guessed[x[0]] ? html`<span class="tick">${Icon.check()}</span>` : null}
       </button>`)}</div>
     </div>
-    <div class="section"><h2 class="h3">Wyniki po ${g.i}. rundzie</h2><${Scoreboard} pl=${g.pl} sc=${addScores(g.sc, d)} d=${d} /></div>
+    <div class="section"><h2 class="h3">Wyniki po ${g.i}. rundzie</h2><${Scoreboard} pl=${g.pl} sc=${addScores(g.sc, d)} d=${d} moves=${g.i > 1} /></div>
     <div class="dock"><button class="btn btn-primary" type="button" onClick=${soloNext}>${g.i >= g.n ? 'Pokaż wyniki końcowe' : 'Następna runda'}</button></div>
   </section>`;
 }
